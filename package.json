@@ -1,1 +1,1 @@
-{"name":"game-platform","version":"0.2.0","private":true,"type":"module","scripts":{"test":"node tests/policy.test.mjs && node tests/gm-rules.test.mjs","check":"npm test"},"engines":{"node":">=20"}}
+{"name":"game-platform","version":"0.3.0","private":true,"type":"module","scripts":{"test":"node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs","check":"npm test"},"engines":{"node":">=20"}}
