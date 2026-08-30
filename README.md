@@ -18,6 +18,7 @@ A persistent AI-native role-playing universe where the world remembers what the 
 - Policy states: AUTO, BOUNDED_AUTO, GATED, PROHIBITED.
 - Consequential external actions remain gated.
 - Dedicated Supabase project with campaign isolation, RLS, server-authoritative game actions and JWT-enforced Edge Functions.
+- Temporary public guest preview uses Supabase anonymous identities: no email/password login, while each guest remains isolated by `auth.uid()` ownership and membership policies.
 
 ## Infrastructure
 
@@ -30,4 +31,4 @@ The repository intentionally contains no service-role keys or private secrets.
 
 ## Current release
 
-**Game Systems v2** — persistent multiplayer world simulation. Supabase security advisor: zero findings after v2 hardening; performance advisor has only unused-index informational notices while the private alpha has low traffic.
+**Game Systems v2 — temporary public guest preview.** Visitors enter with an isolated anonymous identity and can create private campaigns without an email/password login. Guest continuity is browser-bound; clearing browser storage or changing devices can remove access. The temporary mode intentionally produces Supabase anonymous-access advisor warnings, while ownership and campaign-membership predicates remain enforced.
