@@ -24,6 +24,7 @@ A persistent AI-native role-playing universe where the world remembers what the 
 Dedicated Supabase project: `vtrfgckzpjgtmqsnumur` (Singapore).
 
 Production web application: `game-platform-wine-nine.vercel.app`.
+Production deployment source: `main`.
 
 The repository intentionally contains no service-role keys or private secrets.
 
