@@ -58,9 +58,10 @@ function identifyWorld(){
 }
 new MutationObserver(identifyWorld).observe(document.querySelector('#campaignTitle'),{childList:true,subtree:true});identifyWorld();
 
+const finePointer=matchMedia('(hover: hover) and (pointer: fine)').matches;
 document.querySelectorAll('.world-card').forEach(card=>{
-  if(reduceMotion)return;
-  card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;card.style.setProperty('--mx',`${x*100}%`);card.style.setProperty('--my',`${y*100}%`);card.style.transform=`perspective(850px) rotateX(${(0.5-y)*5}deg) rotateY(${(x-.5)*7}deg) translateY(-3px)`});
+  if(reduceMotion||!finePointer)return;
+  card.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;card.style.setProperty('--mx',`${x*100}%`);card.style.setProperty('--my',`${y*100}%`);card.style.transform=`perspective(850px) rotateX(${(0.5-y)*5}deg) rotateY(${(x-.5)*7}deg) translateY(-3px)`});
   card.addEventListener('pointerleave',()=>card.style.transform='');
 });
 
