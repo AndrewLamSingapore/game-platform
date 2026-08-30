@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs && node tests/schema-contract.test.mjs && node tests/onboarding-conversion.test.mjs",
+    "test": "node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs && node tests/schema-contract.test.mjs && node tests/onboarding-conversion.test.mjs && node tests/cinematic-experience.test.mjs",
     "check": "npm test"
   },
   "engines": {
