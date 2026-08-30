@@ -1,1 +1,20 @@
-{"name":"game-platform","version":"0.3.0","private":true,"type":"module","scripts":{"test":"node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs && node tests/schema-contract.test.mjs","check":"npm test"},"engines":{"node":">=20"}}
+{
+  "name": "game-platform",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs && node tests/schema-contract.test.mjs",
+    "check": "npm test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "deployment_baseline": {
+    "date": "2026-08-30",
+    "scope": "non-velyqua",
+    "system": "game-platform",
+    "release": "game-systems-v2-guest-preview",
+    "supersedes": "earlier architecture and deployment checkpoints"
+  }
+}
