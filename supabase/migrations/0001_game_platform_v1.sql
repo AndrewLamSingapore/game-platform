@@ -1,0 +1,21 @@
+-- Canonical schema is deployed in dedicated Supabase project vtrfgckzpjgtmqsnumur.
+-- This migration records the product contract without secrets.
+create table if not exists public.campaigns(id uuid primary key default gen_random_uuid(),owner_id uuid not null references auth.users(id) on delete cascade,name text not null,world_state jsonb not null default '{}'::jsonb,created_at timestamptz not null default now());
+create index if not exists campaigns_owner_idx on public.campaigns(owner_id);
+create table if not exists public.campaign_entities(id uuid primary key default gen_random_uuid(),campaign_id uuid not null references public.campaigns(id) on delete cascade,entity_type text not null check(entity_type in('PC','NPC','LOCATION','FACTION','ITEM')),name text not null,state jsonb not null default '{}'::jsonb,created_at timestamptz not null default now());
+create table if not exists public.campaign_memory(id bigserial primary key,campaign_id uuid not null references public.campaigns(id) on delete cascade,memory_type text not null check(memory_type in('EPISODIC','SEMANTIC','DECISION','QUEST')),content jsonb not null,created_at timestamptz not null default now());
+create table if not exists public.game_approvals(id bigserial primary key,campaign_id uuid not null references public.campaigns(id) on delete cascade,idempotency_key text not null,status text not null default 'PENDING' check(status in('PENDING','APPROVED','REJECTED','EXPIRED')),envelope jsonb not null,created_at timestamptz not null default now(),unique(campaign_id,idempotency_key));
+create table if not exists public.game_events(id uuid primary key default gen_random_uuid(),campaign_id uuid not null references public.campaigns(id) on delete cascade,event_type text not null,payload jsonb not null default '{}'::jsonb,created_at timestamptz not null default now());
+create table if not exists public.game_audit_log(id bigserial primary key,campaign_id uuid not null references public.campaigns(id) on delete cascade,correlation_id text not null,idempotency_key text not null,action_type text not null,policy_state text not null,envelope jsonb not null,decision jsonb not null default '{}'::jsonb,created_at timestamptz not null default now(),unique(campaign_id,idempotency_key));
+alter table public.campaigns enable row level security; alter table public.campaigns force row level security;
+alter table public.campaign_entities enable row level security; alter table public.campaign_entities force row level security;
+alter table public.campaign_memory enable row level security; alter table public.campaign_memory force row level security;
+alter table public.game_approvals enable row level security; alter table public.game_approvals force row level security;
+alter table public.game_events enable row level security; alter table public.game_events force row level security;
+alter table public.game_audit_log enable row level security; alter table public.game_audit_log force row level security;
+create policy campaigns_owner on public.campaigns for all to authenticated using(owner_id=(select auth.uid())) with check(owner_id=(select auth.uid()));
+create policy entities_owner on public.campaign_entities for all to authenticated using(exists(select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=(select auth.uid()))) with check(exists(select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=(select auth.uid())));
+create policy memory_owner on public.campaign_memory for all to authenticated using(exists(select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=(select auth.uid()))) with check(exists(select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=(select auth.uid())));
+create policy approvals_owner on public.game_approvals for select to authenticated using(exists(select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=(select auth.uid())));
+create policy events_owner on public.game_events for select to authenticated using(exists(select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=(select auth.uid())));
+create policy audit_owner on public.game_audit_log for select to authenticated using(exists(select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=(select auth.uid())));
