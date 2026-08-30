@@ -2,7 +2,7 @@
 
 Independent commercial AI-native persistent role-playing platform.
 
-This product implements Shared Design Language v1 concepts independently. It has no runtime, database, secret, deployment, or code dependency on Personal JARVIS or VELYQUA Cloud.
+This product implements Shared Design Language v1 concepts independently. It has no runtime, database, secret, deployment, or code dependency on unrelated portfolio products.
 
 ## Product thesis
 
