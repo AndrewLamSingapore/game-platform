@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {DEFAULT_RULESET,normalizeStats,resolveAttack,equipItem,advanceWorldClock,deriveNpcIntent,canManageCampaign,canPlayCampaign,canViewCampaign,validateQuestEdge} from '../src/game-systems.js';
+assert.equal(DEFAULT_RULESET.dice,'d20');
+assert.deepEqual(normalizeStats({hp:12,max_hp:10}).hp,12);
+let hit=resolveAttack({attacker:{attack:5},defender:{hp:10,armor:12},roll:10,damageRoll:4});assert.equal(hit.hit,true);assert.equal(hit.defender_hp,6);
+let miss=resolveAttack({attacker:{attack:50},defender:{hp:10,armor:1},roll:1,damageRoll:9});assert.equal(miss.hit,false);
+let crit=resolveAttack({attacker:{attack:0},defender:{hp:20,armor:50},roll:20,damageRoll:4});assert.equal(crit.damage,8);
+let eq=equipItem({inventory:[{id:'a',equipped_slot:'MAIN_HAND'},{id:'b'}],itemId:'b',slot:'MAIN_HAND'});assert.equal(eq.ok,true);assert.equal(eq.inventory.find(x=>x.id==='a').equipped_slot,null);assert.equal(eq.inventory.find(x=>x.id==='b').equipped_slot,'MAIN_HAND');
+assert.deepEqual(advanceWorldClock({day:1,hour:23,minute:55},10),{day:2,hour:0,minute:5});
+assert.equal(deriveNpcIntent({hp:5,disposition:-60},{threat_level:1}).intent,'confront');
+assert.equal(canManageCampaign('GM'),true);assert.equal(canManageCampaign('PLAYER'),false);assert.equal(canPlayCampaign('PLAYER'),true);assert.equal(canViewCampaign('SPECTATOR'),true);
+assert.equal(validateQuestEdge('a','b'),true);assert.equal(validateQuestEdge('a','a'),false);
+console.log('Game Systems v2 contract: PASS');
