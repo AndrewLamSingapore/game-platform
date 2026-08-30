@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {classifyAction,authorize,POLICY} from '../src/policy.js';
+assert.equal(classifyAction('npc.dialogue'),POLICY.AUTO);
+assert.equal(classifyAction('world.mutate'),POLICY.BOUNDED_AUTO);
+assert.equal(classifyAction('public.publish'),POLICY.GATED);
+assert.equal(classifyAction('account.purchase'),POLICY.GATED);
+assert.equal(classifyAction('cross_tenant.read'),POLICY.PROHIBITED);
+assert.equal(authorize({tenant_id:'campaign-a',correlation_id:'c1',idempotency_key:'i1',action:'npc.dialogue'}).state,POLICY.AUTO);
+assert.equal(authorize({action:'npc.dialogue'}).state,POLICY.PROHIBITED);
+console.log('Game Platform policy contract: PASS');
