@@ -1,17 +1,19 @@
--- Game Systems v2 hardening: backfill, actor-scoped idempotency, quest integrity, atomic invite claims.
+-- Game Systems v2 hardening aligned to canonical live schema.
+alter table public.campaigns add column if not exists world_state jsonb not null default '{}'::jsonb;
+
 update public.campaign_entities e
 set state=jsonb_set(coalesce(e.state,'{}'::jsonb),'{controlled_by}',to_jsonb(c.owner_id::text),true)
 from public.campaigns c
-where e.campaign_id=c.id and e.entity_type='PC' and not (coalesce(e.state,'{}'::jsonb) ? 'controlled_by');
+where e.campaign_id=c.id and e.kind='PC' and not (coalesce(e.state,'{}'::jsonb) ? 'controlled_by');
 
 insert into public.character_stats(entity_id,campaign_id)
 select e.id,e.campaign_id from public.campaign_entities e
-where e.entity_type in('PC','NPC')
+where e.kind in('PC','NPC')
 on conflict(entity_id) do nothing;
 
 insert into public.npc_agendas(entity_id,campaign_id,agenda,disposition)
 select e.id,e.campaign_id,'observe',0 from public.campaign_entities e
-where e.entity_type='NPC'
+where e.kind='NPC'
 on conflict(entity_id) do nothing;
 
 drop policy if exists audit_actor_select on public.game_audit_log;
@@ -24,9 +26,7 @@ declare from_campaign uuid; to_campaign uuid;
 begin
   select campaign_id into from_campaign from public.campaign_quests where id=new.from_quest_id;
   select campaign_id into to_campaign from public.campaign_quests where id=new.to_quest_id;
-  if from_campaign is null or to_campaign is null or from_campaign<>new.campaign_id or to_campaign<>new.campaign_id then
-    raise exception 'quest_edge_campaign_mismatch';
-  end if;
+  if from_campaign is null or to_campaign is null or from_campaign<>new.campaign_id or to_campaign<>new.campaign_id then raise exception 'quest_edge_campaign_mismatch'; end if;
   return new;
 end $$;
 drop trigger if exists quest_edge_campaign_guard on public.quest_edges;
