@@ -11,6 +11,7 @@ A persistent AI-native role-playing universe where the world remembers what the 
 ## Architecture
 
 - GM Reasoner: bounded creative/stateful reasoner with deterministic fallback.
+- Selective Cinematic Mode: pivotal turns can produce one cached four-second AI video through Vercel AI Gateway, with asynchronous jobs, per-user/campaign limits and text-first fallback.
 - Campaign memory: episodic, semantic, decisions, quests and quest graph.
 - Living entities: player-owned PCs, autonomous NPCs, factions and items.
 - Game Systems v2: multiplayer roles/invites, world clock, rulesets, inventory/equipment, health and deterministic combat.

@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/ecosystem-alignment.test.mjs && node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs && node tests/schema-contract.test.mjs && node tests/onboarding-conversion.test.mjs && node tests/cinematic-experience.test.mjs",
+    "test": "node tests/ecosystem-alignment.test.mjs && node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs && node tests/schema-contract.test.mjs && node tests/onboarding-conversion.test.mjs && node tests/cinematic-experience.test.mjs && node tests/selective-cinematics.test.mjs",
     "check": "npm test"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "deployment_baseline": {
     "date": "2026-08-30",
@@ -18,5 +18,8 @@
     "supersedes": "earlier architecture and deployment checkpoints",
     "redeploy_generation": 1,
     "trigger": "verified-pull-request-merge"
+  },
+  "dependencies": {
+    "ai": "7.0.85"
   }
 }
