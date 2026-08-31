@@ -1,7 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL='https://vtrfgckzpjgtmqsnumur.supabase.co',SUPABASE_KEY='sb_publishable_zsgA314WZue1tlu_Kt-SDQ_UopdKMNs';const db=createClient(SUPABASE_URL,SUPABASE_KEY),$=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));let user=null,campaign=null,role=null,cache={},guestLoginInFlight=false,selectedStarter=null;
 const STARTER_IDS={ashen:'ashen-gate',neon:'neon-midnight',expedition:'last-expedition'};
-const CHARACTER_ICONS=['🦅','🐺','🔥','⚡','🌙','💠','🦂','🗝️','👁️','🛡️','🦊','🌑'];
 function characterVisual(name='',archetype='',kind='NPC'){
   const seed=`${name}|${archetype}|${kind}`;let hash=2166136261;
   for(const char of seed)hash=Math.imul(hash^char.charCodeAt(0),16777619);
@@ -13,7 +12,11 @@ function characterVisual(name='',archetype='',kind='NPC'){
     :/general|warrior|soldier|threat|hunt/.test(key)?['🪓','Ember war-axe','1d10 + 2','heavy']
     :kind==='PC'?['⚔️','Wayfarer blade','1d8 + 2','signature']
     :['🗡️','Frontier shortblade','1d6 + 1','standard'];
-  return{icon:CHARACTER_ICONS[Math.abs(hash)%CHARACTER_ICONS.length],hue:Math.abs(hash)%360,weaponIcon:profile[0],weapon:profile[1],damage:profile[2],rarity:profile[3]};
+  const initials=name.split(/\s+/).filter(Boolean).map(part=>part[0]).join('').slice(0,2).toUpperCase()||'?';
+  const portrait=window.gameCharacterPortrait?.(name);
+  const portraitStyle=portrait?`--portrait-image:url(&quot;${portrait.art}&quot;);--portrait-x:${portrait.x}%;--portrait-y:${portrait.y??38}%`:'';
+  const icon=`<span class="portrait-face${portrait?' has-portrait':''}" style="${portraitStyle}"><span>${esc(initials)}</span></span>`;
+  return{icon,initials,hue:Math.abs(hash)%360,weaponIcon:profile[0],weapon:profile[1],damage:profile[2],rarity:profile[3]};
 }
 window.gameCharacterVisual=characterVisual;
 async function track(event_name,properties={},campaign_id=null){if(!user)return;try{await db.from('product_events').insert({user_id:user.id,campaign_id,event_name,properties})}catch{}}
