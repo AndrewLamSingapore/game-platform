@@ -17,14 +17,15 @@ function render(){
   statusText.textContent=job?label[state]||'Cinematic moment':'Pivotal moment detected';
   progress.value=job?.progress||0;
   progress.hidden=!job||['READY','FAILED'].includes(state);
-  generate.hidden=Boolean(job);
+  generate.hidden=Boolean(job)&&state!=='FAILED';
+  generate.textContent=state==='FAILED'?'Retry cinematic':'Generate cinematic';
   placeholder.hidden=state==='READY';
   video.hidden=state!=='READY';
   replay.hidden=state!=='READY';
   sound.hidden=state!=='READY';
   setBusy(['RESERVED','QUEUED','PROCESSING'].includes(state));
   if(state==='READY'&&job.output_url&&video.src!==job.output_url){video.src=job.output_url;video.muted=true;sound.textContent='Sound off';if(!reduceMotion)video.play().catch(()=>{});}
-  if(state==='FAILED')placeholder.querySelector('p').textContent='The story continues in text. Another pivotal scene can become a cinematic later.';
+  if(state==='FAILED')placeholder.querySelector('p').textContent='Rendering failed before completion. You can retry this scene once without advancing the story.';
 }
 
 async function token(){const{data}=await db.auth.getSession();return data.session?.access_token||'';}
@@ -39,7 +40,7 @@ async function load(detail){
   stopPolling();scene={...detail,key};job=await findJob().catch(()=>null);pollCount=0;render();if(job&&['RESERVED','QUEUED','PROCESSING'].includes(job.status))schedulePoll(1200);
 }
 async function begin(){
-  if(!scene||job)return;setBusy(true);statusText.textContent='Creating the cinematic brief…';
+  if(!scene||(job&&job.status!=='FAILED'))return;setBusy(true);statusText.textContent=job?.status==='FAILED'?'Retrying the cinematic…':'Creating the cinematic brief…';
   try{const result=await call('start',{campaign_id:scene.campaignId,source_turn:scene.sourceTurn});job=result.job;render();if(job&&['RESERVED','QUEUED','PROCESSING'].includes(job.status))schedulePoll(2500);}catch(error){statusText.textContent=error.message;setBusy(false);}
 }
 async function poll(){

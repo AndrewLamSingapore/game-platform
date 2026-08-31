@@ -3,7 +3,7 @@ import {gateway,experimental_startVideo as startVideo,experimental_getVideoStatu
 
 const SUPABASE_URL='https://vtrfgckzpjgtmqsnumur.supabase.co';
 const SUPABASE_KEY='sb_publishable_zsgA314WZue1tlu_Kt-SDQ_UopdKMNs';
-const MODEL=process.env.CINEMATIC_VIDEO_MODEL||'google/veo-3.1-lite-generate-001';
+const MODEL=process.env.CINEMATIC_VIDEO_MODEL||'google/veo-3.1-lite-generate-preview';
 const clean=(value,max=800)=>String(value??'').replace(/\s+/g,' ').trim().slice(0,max);
 const dbHeaders=auth=>({apikey:SUPABASE_KEY,Authorization:auth,'Content-Type':'application/json',Accept:'application/json'});
 const one=value=>Array.isArray(value)?value[0]:value;
@@ -66,8 +66,12 @@ export default async function handler(req,res){
       const fingerprint=createHash('sha256').update(prompt).digest('hex');
       const starter=clean(context.campaign.world_state?.starter_id||'custom',80).replace(/[^a-z0-9-]/gi,'-').toLowerCase();
       const reserved=await rpc('reserve_cinematic_job',{p_campaign_id:campaignId,p_source_turn:sourceTurn,p_scene_key:`${starter}:turn-${sourceTurn}`,p_prompt_fingerprint:fingerprint},auth);
-      const reservedJob=reserved?.job;
-      if(!reserved?.created)return res.status(200).json({job:publicJob(reservedJob),cached:true});
+      let reservedJob=reserved?.job;
+      if(!reserved?.created&&reservedJob?.status==='FAILED'){
+        reservedJob=one(await rpc('retry_cinematic_job',{p_job_id:reservedJob.id},auth));
+      }else if(!reserved?.created){
+        return res.status(200).json({job:publicJob(reservedJob),cached:true});
+      }
       try{
         const started=await startVideo({model:gateway.video(MODEL),prompt,duration:4,aspectRatio:'16:9',generateAudio:false,maxRetries:1,providerOptions:{gateway:{user:user.id,tags:['feature:selective-cinematic','product:game-platform']}}});
         const queued=one(await rpc('transition_cinematic_job',{p_job_id:reservedJob.id,p_status:'QUEUED',p_operation:started.operation},auth));

@@ -342,7 +342,8 @@ function characterIdentity(name,details=[]){
     [/spy|watch|observe|secret/,'Watcher','◉']
   ];
   const match=roles.find(([pattern])=>pattern.test(objective+name.toLowerCase()));
-  return{hue:Math.abs(hash)%360,role:match?.[1]||'Unknown',symbol:match?.[2]||['●','■','✦','⬟'][Math.abs(hash)%4],variant:Math.abs(hash)%4};
+  const visual=window.gameCharacterVisual?.(name,details[0]||'',match?.[1]||'NPC');
+  return{hue:visual?.hue??Math.abs(hash)%360,role:match?.[1]||'Unknown',symbol:visual?.icon||match?.[2]||['●','■','✦','⬟'][Math.abs(hash)%4],variant:Math.abs(hash)%4,weaponIcon:visual?.weaponIcon||'🗡️',weapon:visual?.weapon||'Frontier shortblade',damage:visual?.damage||'1d6 + 1'};
 }
 
 function updatePeoplePresent(){
@@ -385,6 +386,7 @@ function updatePeoplePresent(){
     const moodLine=document.createElement('div');
     const objective=document.createElement('div');
     const detail=document.createElement('div');
+    const weapon=document.createElement('div');
     strong.textContent=name;
     role.className='presence-role';
     role.textContent=identity.role;
@@ -395,7 +397,9 @@ function updatePeoplePresent(){
     objective.textContent=details[0]||'Watching what you choose.';
     detail.className='presence-detail';
     detail.textContent=details[1]||'No shared history yet.';
-    copy.append(headline,moodLine,objective,detail);
+    weapon.className='presence-weapon';
+    weapon.innerHTML=`<span aria-hidden="true">${identity.weaponIcon}</span><b>${identity.weapon}</b><small>${identity.damage} · equipped</small>`;
+    copy.append(headline,moodLine,objective,detail,weapon);
     item.append(avatar,copy);
     return item;
   }));

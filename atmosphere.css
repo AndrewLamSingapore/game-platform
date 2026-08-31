@@ -607,11 +607,17 @@ body[data-world="last-expedition"] {
 .presence-variant-1 .presence-avatar { border-radius: 50% 20% 50% 20%; }
 .presence-variant-2 .presence-avatar { border-radius: 12px; transform: rotate(-3deg); }
 .presence-variant-3 .presence-avatar { clip-path: polygon(50% 0, 96% 26%, 84% 84%, 50% 100%, 16% 84%, 4% 26%); border-radius: 0; }
-.presence-symbol { font-size: 18px; line-height: 1; }
+.presence-symbol { font-size: 24px; line-height: 1; filter:drop-shadow(0 2px 5px rgba(0,0,0,.65)); }
 .presence-avatar small { position:absolute; right:3px; bottom:1px; font-size:8px; font-weight:950; color:white; text-shadow:0 1px 3px #000; }
 .presence-headline { display:flex; align-items:center; justify-content:space-between; gap:6px; }
 .presence-role { flex:0; padding:2px 6px; border:1px solid hsl(var(--person-hue) 62% 56% / .45); border-radius:999px; color:hsl(var(--person-hue) 88% 78%); font-size:8px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
 .presence-objective { margin-top:4px; color:#e1e5ef; font-size:11px; line-height:1.35; }
+.presence-weapon,.weapon-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:7px;color:#f4dfb0;font-size:10px;line-height:1.25}
+.presence-weapon small,.weapon-line span:last-child{color:#9da6b9;font-size:9px;text-transform:uppercase;letter-spacing:.04em}
+.character-chip,.npc-chip,.stat-chip{display:flex!important;align-items:flex-start;gap:12px;border-left:3px solid hsl(var(--character-hue) 76% 58%)!important;background:linear-gradient(105deg,hsl(var(--character-hue) 62% 20% / .18),rgba(9,11,18,.7))!important}
+.character-copy,.stat-chip>div{min-width:0;flex:1}
+.character-icon,.stat-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid hsl(var(--character-hue) 82% 66% / .7);border-radius:14px;background:radial-gradient(circle at 35% 25%,hsl(var(--character-hue) 90% 72% / .3),transparent 40%),hsl(var(--character-hue) 55% 17%);font-size:23px;box-shadow:0 0 22px hsl(var(--character-hue) 80% 52% / .2)}
+.stat-icon{flex-basis:36px;width:36px;height:36px;border-radius:50%;font-size:19px}
 
 .cinematic-stage {
   width: min(1120px, calc(100% - 28px));
