@@ -333,15 +333,26 @@ function updatePeoplePresent(){
   const target=document.querySelector('#peoplePresent');
   const source=document.querySelector('#npcs');
   if(!target||!source)return;
-  const cards=[...source.querySelectorAll('.chip')].slice(0,4);
-  if(!cards.length){
-    target.innerHTML='<div class="presence-empty">No one is close enough to read yet. The world is still moving beyond this scene.</div>';
-    return;
-  }
-  target.replaceChildren(...cards.map(sourceCard=>{
+  const candidates=[...source.querySelectorAll('.chip')].map(sourceCard=>{
     const name=sourceCard.querySelector('b')?.textContent?.trim()||'Unknown';
     const mood=sourceCard.querySelector('.pill')?.textContent?.trim()||'watchful';
     const details=[...sourceCard.querySelectorAll('.muted')].map(node=>node.textContent.trim()).filter(Boolean);
+    const normalized=name.toLowerCase().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim();
+    const score=(mood.toLowerCase()==='neutral'?0:100)+name.length+(details[1]?.length||0);
+    return{name,mood,details,normalized,score};
+  });
+  const characters=[];
+  for(const candidate of candidates){
+    const index=characters.findIndex(item=>item.normalized===candidate.normalized||item.normalized.startsWith(candidate.normalized+' ')||candidate.normalized.startsWith(item.normalized+' '));
+    if(index<0)characters.push(candidate);
+    else if(candidate.score>characters[index].score)characters[index]=candidate;
+  }
+  const visible=characters.slice(0,4);
+  if(!visible.length){
+    target.innerHTML='<div class="presence-empty">No one is close enough to read yet. The world is still moving beyond this scene.</div>';
+    return;
+  }
+  target.replaceChildren(...visible.map(({name,mood,details})=>{
     const item=document.createElement('div');
     item.className='presence-card';
     const avatar=document.createElement('div');
