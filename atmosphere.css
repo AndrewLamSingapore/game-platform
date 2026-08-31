@@ -710,3 +710,17 @@ body[data-world="last-expedition"] {
 .shot-reckoning{background:radial-gradient(circle at 50% 50%,var(--world-glow),transparent 32%),var(--world-art) center/cover no-repeat}
 .shot-reckoning::after{background:linear-gradient(rgba(3,5,10,.52),rgba(3,5,10,.88)),radial-gradient(circle at 50% 50%,transparent,rgba(3,5,10,.72))}
 @media(max-width:680px){.cinematic-portraits{gap:10px;padding:18px}.cinematic-portraits span{width:clamp(56px,20vw,88px)}.cinematic-portraits span:nth-child(n+4){display:none}}
+
+
+/* State-driven cinematic grade */
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;transition:background 1.4s ease,opacity 1.4s ease;opacity:.42}
+body[data-phase="DAWN"]::after{background:linear-gradient(115deg,rgba(255,145,92,.28),transparent 45%,rgba(88,103,170,.18))}
+body[data-phase="DAY"]::after{background:radial-gradient(circle at 65% 10%,rgba(255,232,184,.15),transparent 48%)}
+body[data-phase="DUSK"]::after{background:linear-gradient(135deg,rgba(221,91,62,.25),rgba(52,35,87,.2) 65%,rgba(8,10,20,.28))}
+body[data-phase="NIGHT"]::after{background:linear-gradient(160deg,rgba(4,7,20,.72),rgba(22,20,50,.48));opacity:.78}
+body[data-weather="FOG"]::after{background:linear-gradient(180deg,rgba(205,213,221,.32),rgba(100,111,128,.22) 48%,rgba(18,22,34,.38));backdrop-filter:saturate(.7) contrast(.88)}
+body[data-weather="RAIN"]::after{background:linear-gradient(165deg,rgba(21,36,59,.38),rgba(5,8,18,.5));backdrop-filter:saturate(.72) contrast(1.08)}
+body[data-visibility="NEAR_ZERO"] main{filter:brightness(.72) contrast(1.14)}
+body[data-visibility="DARK"] main{filter:brightness(.82)}
+body[data-phase="NIGHT"] .scene-shell,body[data-weather="RAIN"] .scene-shell{box-shadow:0 28px 90px rgba(0,0,12,.62),inset 0 0 80px rgba(90,110,180,.05)}
+@media(prefers-reduced-motion:reduce){body::after{transition:none}}
