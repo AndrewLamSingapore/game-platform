@@ -580,3 +580,35 @@ body[data-world="last-expedition"] {
     transition-duration: .01ms;
   }
 }
+
+
+/* Stable visual identities for Living Characters */
+.presence-card {
+  --person-hue: 32;
+  border-left: 3px solid hsl(var(--person-hue) 78% 58%);
+  background:
+    linear-gradient(105deg, hsl(var(--person-hue) 55% 18% / .34), transparent 58%),
+    rgba(4, 6, 11, .58);
+}
+.presence-card.presence-variant-1 { border-radius: 14px 4px 14px 4px; }
+.presence-card.presence-variant-2 { border-radius: 4px 14px 4px 14px; }
+.presence-card.presence-variant-3 { border-left-width: 5px; }
+.presence-avatar {
+  position: relative;
+  overflow: hidden;
+  border-color: hsl(var(--person-hue) 74% 62% / .8);
+  border-radius: 34% 66% 58% 42%;
+  background:
+    radial-gradient(circle at 35% 28%, hsl(var(--person-hue) 92% 78%), transparent 25%),
+    linear-gradient(145deg, hsl(var(--person-hue) 72% 58%), hsl(calc(var(--person-hue) + 42) 52% 22%));
+  color: #080a10;
+  box-shadow: 0 0 24px hsl(var(--person-hue) 78% 55% / .25);
+}
+.presence-variant-1 .presence-avatar { border-radius: 50% 20% 50% 20%; }
+.presence-variant-2 .presence-avatar { border-radius: 12px; transform: rotate(-3deg); }
+.presence-variant-3 .presence-avatar { clip-path: polygon(50% 0, 96% 26%, 84% 84%, 50% 100%, 16% 84%, 4% 26%); border-radius: 0; }
+.presence-symbol { font-size: 18px; line-height: 1; }
+.presence-avatar small { position:absolute; right:3px; bottom:1px; font-size:8px; font-weight:950; color:white; text-shadow:0 1px 3px #000; }
+.presence-headline { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.presence-role { flex:0; padding:2px 6px; border:1px solid hsl(var(--person-hue) 62% 56% / .45); border-radius:999px; color:hsl(var(--person-hue) 88% 78%); font-size:8px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.presence-objective { margin-top:4px; color:#e1e5ef; font-size:11px; line-height:1.35; }
