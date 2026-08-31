@@ -233,6 +233,9 @@ function applyWorld(worldId){
   document.body.dataset.world=worldId||'';
   const data=worlds[worldId];
   const state=parseWorldState();
+  document.body.dataset.phase=state.day_phase||state.environment?.phase||'DAY';
+  document.body.dataset.weather=state.environment?.weather||'CLEAR';
+  document.body.dataset.visibility=state.environment?.visibility||'CLEAR';
   const atmosphere=document.querySelector('#sceneAtmosphere');
   const location=document.querySelector('#sceneLocation');
   if(atmosphere)atmosphere.textContent=data?.atmosphere||'The world is listening';
@@ -450,8 +453,13 @@ if(!reduceMotion){
   }
   function draw(time){
     context.clearRect(0,0,innerWidth,innerHeight);
-    const world=currentWorld();
-    if(world==='neon-midnight'){
+    const world=currentWorld(),weather=document.body.dataset.weather,phase=document.body.dataset.phase;
+    if(weather==='RAIN'){
+      context.strokeStyle=phase==='NIGHT'?'rgba(150,185,255,.34)':'rgba(205,225,255,.3)';context.lineWidth=1;
+      for(const particle of particles){particle.y+=particle.speed*4.8;particle.x-=1.2;if(particle.y>innerHeight){particle.y=-18;particle.x=Math.random()*innerWidth}context.globalAlpha=particle.alpha;context.beginPath();context.moveTo(particle.x,particle.y);context.lineTo(particle.x-7,particle.y+20);context.stroke();}
+    }else if(weather==='FOG'){
+      for(const particle of particles){particle.x+=particle.speed*.16;particle.y+=Math.sin(time/1800+particle.x*.01)*.08;if(particle.x>innerWidth+30)particle.x=-30;context.globalAlpha=.035+particle.alpha*.12;context.fillStyle='rgb(220,226,232)';context.beginPath();context.ellipse(particle.x,particle.y,particle.radius*18+20,particle.radius*5+7,0,0,Math.PI*2);context.fill();}
+    }else if(world==='neon-midnight'){
       context.strokeStyle='rgba(95,244,255,.18)';
       context.lineWidth=1;
       for(const particle of particles){
