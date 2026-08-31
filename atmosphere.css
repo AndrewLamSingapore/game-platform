@@ -643,3 +643,20 @@ body[data-world="last-expedition"] {
 @keyframes cinematicPulse{50%{transform:scale(1.08);opacity:.65}}
 @media(max-width:680px){.cinematic-stage{width:calc(100% - 12px);margin:-36px auto 20px;border-radius:18px}.cinematic-frame{min-height:300px;aspect-ratio:auto}.cinematic-placeholder{grid-template-columns:1fr;gap:14px;padding:28px}.cinematic-orb{width:48px;height:48px}.cinematic-controls{align-items:stretch;flex-direction:column}.cinematic-actions{justify-content:stretch}.cinematic-actions button{flex:1}.cinematic-controls progress{width:100%}}
 @media(prefers-reduced-motion:reduce){.cinematic-orb{animation:none}}
+
+/* Zero-cost living cinematic */
+.cinematic-vignette{position:absolute;inset:0;overflow:hidden;isolation:isolate;background:#05070d}
+.vignette-art,.vignette-light{position:absolute;inset:-5%;pointer-events:none}
+.vignette-art{z-index:-2;background:var(--world-art) center/cover no-repeat;filter:saturate(.72) contrast(1.12) brightness(.68);transform:scale(1.08)}
+.vignette-light{z-index:-1;background:radial-gradient(circle at 72% 30%,color-mix(in srgb,var(--world-accent-2),transparent 18%),transparent 7%),linear-gradient(105deg,rgba(4,6,11,.92) 8%,rgba(4,6,11,.2) 62%),linear-gradient(to top,#05070d 0,transparent 58%);mix-blend-mode:screen;opacity:.42}
+.vignette-copy{position:absolute;left:clamp(24px,7vw,82px);right:clamp(24px,7vw,82px);bottom:clamp(26px,8vw,76px);max-width:720px;text-shadow:0 3px 24px #000}
+.vignette-copy small{display:block;margin-bottom:8px;color:var(--world-accent-2);font-size:10px;font-weight:900;letter-spacing:.16em}
+.vignette-copy strong{display:block;font-size:clamp(28px,5vw,58px);line-height:1.02;letter-spacing:-.04em}
+.vignette-copy p{max-width:660px;margin:12px 0 0;color:#f2f3f7;font-size:clamp(14px,2vw,20px);line-height:1.45}
+.cinematic-vignette.is-playing .vignette-art{animation:livingCamera 4s cubic-bezier(.18,.76,.24,1) both}
+.cinematic-vignette.is-playing .vignette-light{animation:livingLight 4s ease both}
+.cinematic-vignette.is-playing .vignette-copy{animation:livingCopy 4s ease both}
+@keyframes livingCamera{0%{transform:scale(1.16) translate3d(-1.2%,.8%,0);filter:saturate(.42) contrast(1.2) brightness(.38)}45%{filter:saturate(.86) contrast(1.12) brightness(.72)}100%{transform:scale(1.04) translate3d(.5%,-.4%,0);filter:saturate(.72) contrast(1.12) brightness(.62)}}
+@keyframes livingLight{0%{opacity:0}24%{opacity:.58}72%{opacity:.36}100%{opacity:.18}}
+@keyframes livingCopy{0%,18%{opacity:0;transform:translateY(18px)}38%,82%{opacity:1;transform:none}100%{opacity:.7;transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){.cinematic-vignette.is-playing .vignette-art,.cinematic-vignette.is-playing .vignette-light,.cinematic-vignette.is-playing .vignette-copy{animation:none}.vignette-art{transform:none}.vignette-copy{opacity:1}}
