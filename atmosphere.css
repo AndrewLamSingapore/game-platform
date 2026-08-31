@@ -1,0 +1,583 @@
++:root {
++  --world-accent: #a88bff;
++  --world-accent-2: #71e8ff;
++  --world-glow: rgba(168, 139, 255, .28);
++  --world-art: none;
++}
++
++body {
++  transition: background-color .7s ease, color .4s ease;
++}
++
++body[data-world="ashen-gate"] {
++  --world-accent: #ff9b61;
++  --world-accent-2: #ffd18a;
++  --world-glow: rgba(255, 116, 61, .28);
++  --world-art: url("/assets/worlds/ashen-gate.webp");
++}
++
++body[data-world="neon-midnight"] {
++  --world-accent: #ff6df0;
++  --world-accent-2: #5ff4ff;
++  --world-glow: rgba(91, 222, 255, .27);
++  --world-art: url("/assets/worlds/neon-after-midnight.webp");
++}
++
++body[data-world="last-expedition"] {
++  --world-accent: #63e2c6;
++  --world-accent-2: #c9fff0;
++  --world-glow: rgba(77, 219, 194, .25);
++  --world-art: url("/assets/worlds/last-expedition.webp");
++}
++
++#dashboard {
++  position: relative;
++}
++
++#dashboard::before {
++  content: "";
++  position: absolute;
++  z-index: -1;
++  top: -32px;
++  left: 50%;
++  width: min(100vw, 1320px);
++  height: 460px;
++  transform: translateX(-50%);
++  background:
++    linear-gradient(90deg, #070810 0, transparent 20%, transparent 80%, #070810 100%),
++    linear-gradient(to bottom, rgba(7, 8, 16, .08), #070810 94%),
++    url("/assets/worlds/neon-after-midnight.webp") center 48% / cover;
++  filter: saturate(.75);
++  opacity: .13;
++  pointer-events: none;
++  mask-image: linear-gradient(to bottom, #000, transparent 96%);
++}
++
++.dashboard-hero {
++  position: relative;
++  min-height: 360px;
++  display: grid;
++  align-content: center;
++}
++
++.world-grid {
++  align-items: stretch;
++}
++
++.world-card {
++  --card-art: none;
++  --card-accent: #a88bff;
++  min-height: 430px;
++  border-color: color-mix(in srgb, var(--card-accent), transparent 70%);
++  background: #0b0d14;
++  box-shadow: 0 24px 70px rgba(0, 0, 0, .44);
++  transform-style: preserve-3d;
++  will-change: transform;
++}
++
++.world-card.ashen {
++  --card-art: url("/assets/worlds/ashen-gate.webp");
++  --card-accent: #ff9b61;
++}
++
++.world-card.neon {
++  --card-art: url("/assets/worlds/neon-after-midnight.webp");
++  --card-accent: #5ff4ff;
++}
++
++.world-card.expedition {
++  --card-art: url("/assets/worlds/last-expedition.webp");
++  --card-accent: #63e2c6;
++}
++
++.world-card.ashen::before,
++.world-card.neon::before,
++.world-card.expedition::before {
++  background: var(--card-art) center / cover no-repeat;
++  filter: saturate(.9) contrast(1.05);
++  transform: scale(1.015);
++}
++
++.world-card::after {
++  background:
++    radial-gradient(circle at var(--mx, 50%) var(--my, 40%), rgba(255, 255, 255, .18), transparent 24%),
++    linear-gradient(to top, rgba(5, 6, 10, .99) 5%, rgba(5, 6, 10, .86) 42%, rgba(5, 6, 10, .04) 76%),
++    linear-gradient(140deg, transparent 55%, color-mix(in srgb, var(--card-accent), transparent 84%));
++}
++
++.world-card:hover,
++.world-card:focus-visible {
++  border-color: color-mix(in srgb, var(--card-accent), white 15%);
++  box-shadow: 0 28px 90px rgba(0, 0, 0, .58), 0 0 42px color-mix(in srgb, var(--card-accent), transparent 78%);
++}
++
++.world-card:hover::before,
++.world-card:focus-visible::before {
++  transform: scale(1.075);
++}
++
++.world-card:focus-visible {
++  outline: 3px solid var(--card-accent);
++  outline-offset: 4px;
++}
++
++.world-omen {
++  position: absolute;
++  top: 18px;
++  left: 18px;
++  right: 18px;
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  color: rgba(255, 255, 255, .86);
++  font-size: 10px;
++  font-weight: 900;
++  letter-spacing: .14em;
++  text-transform: uppercase;
++  text-shadow: 0 2px 12px #000;
++}
++
++.world-omen::after {
++  content: "";
++  width: 54px;
++  height: 1px;
++  background: linear-gradient(90deg, var(--card-accent), transparent);
++}
++
++.world-card h2,
++.world-card p,
++.world-card .world-meta,
++.world-card .world-action {
++  position: relative;
++  z-index: 1;
++}
++
++.world-card h2 {
++  text-shadow: 0 3px 22px #000;
++}
++
++.world-action {
++  color: var(--card-accent);
++}
++
++.scene-hero {
++  position: relative;
++  min-height: clamp(300px, 42vw, 500px);
++  margin: -28px calc(50% - 50vw) 22px;
++  padding: clamp(78px, 11vw, 135px) max(18px, calc((100vw - 1244px) / 2)) 32px;
++  display: flex;
++  align-items: flex-end;
++  overflow: hidden;
++  isolation: isolate;
++  border-bottom: 1px solid color-mix(in srgb, var(--world-accent), transparent 66%);
++}
++
++.scene-hero::before,
++.scene-hero::after {
++  content: "";
++  position: absolute;
++  inset: 0;
++  z-index: -2;
++  pointer-events: none;
++}
++
++.scene-hero::before {
++  background: var(--world-art) center / cover no-repeat;
++  transform: scale(1.035);
++  animation: sceneDrift 24s ease-in-out infinite alternate;
++}
++
++.scene-hero::after {
++  z-index: -1;
++  background:
++    linear-gradient(to top, #070810 0, rgba(7, 8, 16, .56) 44%, rgba(7, 8, 16, .12) 82%),
++    linear-gradient(90deg, rgba(7, 8, 16, .76), transparent 58%);
++}
++
++.scene-copy {
++  width: min(780px, 100%);
++}
++
++.scene-copy h1 {
++  margin-bottom: 10px;
++  text-shadow: 0 4px 28px #000;
++}
++
++.scene-status {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 8px;
++  align-items: center;
++}
++
++.scene-status span {
++  padding: 6px 10px;
++  border: 1px solid rgba(255, 255, 255, .2);
++  border-radius: 999px;
++  background: rgba(5, 7, 12, .58);
++  backdrop-filter: blur(10px);
++  color: #eef3f5;
++  font-size: 12px;
++}
++
++.scene-status span:first-child {
++  border-color: color-mix(in srgb, var(--world-accent), transparent 42%);
++  color: var(--world-accent-2);
++}
++
++.scene-back {
++  position: absolute;
++  top: 24px;
++  right: max(18px, calc((100vw - 1244px) / 2));
++  z-index: 1;
++}
++
++.play-layout {
++  display: grid;
++  grid-template-columns: minmax(0, 1fr) 300px;
++  gap: 18px;
++  align-items: start;
++}
++
++.people-present {
++  position: sticky;
++  top: 92px;
++  padding: 18px;
++  border: 1px solid color-mix(in srgb, var(--world-accent), transparent 65%);
++  border-radius: 20px;
++  background:
++    radial-gradient(circle at 100% 0, var(--world-glow), transparent 36%),
++    linear-gradient(150deg, rgba(20, 23, 34, .96), rgba(10, 12, 20, .96));
++  box-shadow: 0 22px 60px rgba(0, 0, 0, .36);
++}
++
++.people-present header {
++  position: static;
++  display: block;
++  padding: 0 0 12px;
++  border: 0;
++  background: none;
++  backdrop-filter: none;
++}
++
++.people-present h2 {
++  margin: 4px 0;
++}
++
++.people-present .muted {
++  margin: 0;
++  font-size: 12px;
++}
++
++.presence-list {
++  display: grid;
++  gap: 9px;
++}
++
++.presence-card {
++  position: relative;
++  display: grid;
++  grid-template-columns: 42px minmax(0, 1fr);
++  gap: 10px;
++  align-items: center;
++  padding: 11px;
++  border: 1px solid rgba(255, 255, 255, .09);
++  border-radius: 14px;
++  background: rgba(4, 6, 11, .48);
++}
++
++.presence-avatar {
++  width: 42px;
++  height: 42px;
++  display: grid;
++  place-items: center;
++  border: 1px solid color-mix(in srgb, var(--world-accent), transparent 52%);
++  border-radius: 50%;
++  background: radial-gradient(circle at 36% 30%, var(--world-accent-2), var(--world-accent) 34%, #111522 72%);
++  color: #06080d;
++  font-weight: 950;
++  box-shadow: 0 0 24px var(--world-glow);
++}
++
++.presence-card b {
++  display: block;
++  overflow: hidden;
++  text-overflow: ellipsis;
++  white-space: nowrap;
++}
++
++.presence-mood {
++  color: var(--world-accent-2);
++  font-size: 11px;
++  text-transform: capitalize;
++}
++
++.presence-detail {
++  margin-top: 3px;
++  color: #aeb5c6;
++  font-size: 11px;
++  line-height: 1.35;
++}
++
++.presence-empty {
++  padding: 14px;
++  border: 1px dashed rgba(255, 255, 255, .16);
++  border-radius: 14px;
++  color: #aeb5c6;
++  font-size: 13px;
++}
++
++.story-panel {
++  border-color: color-mix(in srgb, var(--world-accent), transparent 70%);
++  background:
++    radial-gradient(circle at 90% 0, var(--world-glow), transparent 34%),
++    linear-gradient(145deg, rgba(23, 26, 41, .97), rgba(13, 15, 24, .97));
++}
++
++.section-kicker,
++.decision-label {
++  color: var(--world-accent-2);
++}
++
++.quest-focus {
++  border-left-color: var(--world-accent);
++}
++
++.choice {
++  border-color: color-mix(in srgb, var(--world-accent), transparent 65%);
++}
++
++.choice:hover,
++.choice:focus-visible {
++  border-color: var(--world-accent);
++}
++
++#worldPreview {
++  width: min(930px, calc(100vw - 28px));
++  max-height: min(88vh, 820px);
++  padding: 0;
++  overflow: auto;
++  border: 1px solid rgba(255, 255, 255, .2);
++  border-radius: 26px;
++  background: #090b12;
++  color: #f5f2ec;
++  box-shadow: 0 42px 130px #000;
++}
++
++#worldPreview::backdrop {
++  background: rgba(2, 3, 7, .82);
++  backdrop-filter: blur(12px);
++}
++
++.preview-art {
++  position: relative;
++  min-height: 330px;
++  padding: 26px;
++  display: flex;
++  align-items: flex-end;
++  background: var(--preview-art) center / cover no-repeat;
++  isolation: isolate;
++}
++
++.preview-art::after {
++  content: "";
++  position: absolute;
++  z-index: -1;
++  inset: 0;
++  background: linear-gradient(to top, #090b12 0, rgba(9, 11, 18, .62) 52%, rgba(9, 11, 18, .08));
++}
++
++.preview-copy {
++  max-width: 710px;
++}
++
++.preview-copy h2 {
++  margin: 7px 0 8px;
++  font-size: clamp(34px, 6vw, 58px);
++  letter-spacing: -.045em;
++  text-shadow: 0 4px 28px #000;
++}
++
++.preview-copy p {
++  max-width: 650px;
++  margin: 0;
++  color: #e2e3e8;
++  font-size: 17px;
++  line-height: 1.5;
++}
++
++.preview-close {
++  position: absolute;
++  top: 18px;
++  right: 18px;
++  z-index: 2;
++  width: 42px;
++  height: 42px;
++  padding: 0;
++  border: 1px solid rgba(255, 255, 255, .25);
++  background: rgba(6, 8, 14, .72);
++  color: white;
++  font-size: 20px;
++}
++
++.preview-details {
++  display: grid;
++  grid-template-columns: 1.05fr .95fr;
++  gap: 20px;
++  padding: 24px 26px 28px;
++}
++
++.preview-danger {
++  padding: 14px;
++  border-left: 3px solid var(--preview-accent, #a88bff);
++  border-radius: 10px;
++  background: rgba(255, 255, 255, .045);
++  color: #d8dce6;
++  line-height: 1.5;
++}
++
++.preview-characters {
++  display: grid;
++  gap: 8px;
++}
++
++.preview-character {
++  padding: 10px 12px;
++  border: 1px solid rgba(255, 255, 255, .1);
++  border-radius: 12px;
++  background: rgba(255, 255, 255, .035);
++}
++
++.preview-character small {
++  display: block;
++  margin-top: 2px;
++  color: #9ca5b8;
++}
++
++.preview-actions {
++  display: flex;
++  gap: 10px;
++  margin-top: 16px;
++}
++
++.preview-actions button {
++  flex: 1;
++}
++
++.world-transition {
++  position: fixed;
++  z-index: 50;
++  inset: 0;
++  display: grid;
++  place-items: center;
++  padding: 28px;
++  background:
++    linear-gradient(rgba(4, 5, 9, .58), rgba(4, 5, 9, .92)),
++    var(--transition-art, none) center / cover no-repeat;
++  opacity: 0;
++  visibility: hidden;
++  transition: opacity .55s ease, visibility .55s;
++}
++
++.world-entering .world-transition {
++  opacity: 1;
++  visibility: visible;
++}
++
++.world-transition div {
++  text-align: center;
++}
++
++.world-transition strong {
++  display: block;
++  margin-top: 8px;
++  font-size: clamp(36px, 7vw, 72px);
++  letter-spacing: -.05em;
++}
++
++#atmosphere {
++  mix-blend-mode: screen;
++}
++
++@keyframes sceneDrift {
++  from { transform: scale(1.035) translate3d(-.4%, 0, 0); }
++  to { transform: scale(1.075) translate3d(.6%, -.5%, 0); }
++}
++
++@media (max-width: 900px) {
++  .play-layout {
++    grid-template-columns: 1fr;
++  }
++
++  .people-present {
++    position: static;
++    order: -1;
++  }
++
++  .presence-list {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++  }
++}
++
++@media (max-width: 680px) {
++  .dashboard-hero {
++    min-height: 310px;
++  }
++
++  .world-card {
++    min-height: 360px;
++  }
++
++  .scene-hero {
++    min-height: 390px;
++    margin-top: -22px;
++    padding-top: 100px;
++  }
++
++  .scene-back {
++    top: 16px;
++    right: 12px;
++  }
++
++  .scene-copy h1 {
++    font-size: 46px;
++  }
++
++  .presence-list,
++  .preview-details {
++    grid-template-columns: 1fr;
++  }
++
++  .preview-art {
++    min-height: 390px;
++    padding: 22px;
++  }
++
++  .preview-details {
++    padding: 20px;
++  }
++
++  .preview-actions {
++    flex-direction: column-reverse;
++  }
++}
++
++@media (prefers-reduced-motion: reduce) {
++  *,
++  *::before,
++  *::after {
++    scroll-behavior: auto !important;
++  }
++
++  .scene-hero::before,
++  .world-card::before {
++    animation: none !important;
++    transition: none !important;
++    transform: none !important;
++  }
++
++  .world-transition {
++    transition-duration: .01ms;
++  }
++}
++
