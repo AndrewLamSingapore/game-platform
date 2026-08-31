@@ -3,7 +3,7 @@ import {gateway,experimental_startVideo as startVideo,experimental_getVideoStatu
 
 const SUPABASE_URL='https://vtrfgckzpjgtmqsnumur.supabase.co';
 const SUPABASE_KEY='sb_publishable_zsgA314WZue1tlu_Kt-SDQ_UopdKMNs';
-const MODEL=process.env.CINEMATIC_VIDEO_MODEL||'google/veo-3.1-lite-generate-preview';
+const MODEL=process.env.CINEMATIC_VIDEO_MODEL||'google/veo-3.1-generate-001';
 const clean=(value,max=800)=>String(value??'').replace(/\s+/g,' ').trim().slice(0,max);
 const dbHeaders=auth=>({apikey:SUPABASE_KEY,Authorization:auth,'Content-Type':'application/json',Accept:'application/json'});
 const one=value=>Array.isArray(value)?value[0]:value;
