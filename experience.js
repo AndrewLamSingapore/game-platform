@@ -329,6 +329,22 @@ enterWorld?.addEventListener('click',()=>{
   },delay);
 });
 
+function characterIdentity(name,details=[]){
+  let hash=2166136261;
+  for(const char of name)hash=Math.imul(hash^char.charCodeAt(0),16777619);
+  const objective=(details[0]||'').toLowerCase();
+  const roles=[
+    [/guard|protect|patrol|captain|commander/,'Sentinel','◆'],
+    [/archive|record|research|investigate|scholar/,'Keeper','✦'],
+    [/trade|merchant|deal|smuggl/,'Broker','◈'],
+    [/heal|rescue|assist|hope/,'Ally','✚'],
+    [/hunt|confront|attack|revenge/,'Threat','▲'],
+    [/spy|watch|observe|secret/,'Watcher','◉']
+  ];
+  const match=roles.find(([pattern])=>pattern.test(objective+name.toLowerCase()));
+  return{hue:Math.abs(hash)%360,role:match?.[1]||'Unknown',symbol:match?.[2]||['●','■','✦','⬟'][Math.abs(hash)%4],variant:Math.abs(hash)%4};
+}
+
 function updatePeoplePresent(){
   const target=document.querySelector('#peoplePresent');
   const source=document.querySelector('#npcs');
@@ -353,22 +369,33 @@ function updatePeoplePresent(){
     return;
   }
   target.replaceChildren(...visible.map(({name,mood,details})=>{
+    const identity=characterIdentity(name,details);
     const item=document.createElement('div');
-    item.className='presence-card';
+    item.className=`presence-card presence-variant-${identity.variant}`;
+    item.style.setProperty('--person-hue',identity.hue);
     const avatar=document.createElement('div');
     avatar.className='presence-avatar';
     avatar.setAttribute('aria-hidden','true');
-    avatar.textContent=name.split(/\s+/).map(part=>part[0]).join('').slice(0,2).toUpperCase();
+    avatar.innerHTML=`<span class="presence-symbol">${identity.symbol}</span><small>${name.split(/\s+/).map(part=>part[0]).join('').slice(0,2).toUpperCase()}</small>`;
     const copy=document.createElement('div');
+    const headline=document.createElement('div');
+    headline.className='presence-headline';
     const strong=document.createElement('b');
+    const role=document.createElement('span');
     const moodLine=document.createElement('div');
+    const objective=document.createElement('div');
     const detail=document.createElement('div');
     strong.textContent=name;
+    role.className='presence-role';
+    role.textContent=identity.role;
+    headline.append(strong,role);
     moodLine.className='presence-mood';
     moodLine.textContent=mood;
+    objective.className='presence-objective';
+    objective.textContent=details[0]||'Watching what you choose.';
     detail.className='presence-detail';
-    detail.textContent=details[1]||details[0]||'Watching what you choose.';
-    copy.append(strong,moodLine,detail);
+    detail.textContent=details[1]||'No shared history yet.';
+    copy.append(headline,moodLine,objective,detail);
     item.append(avatar,copy);
     return item;
   }));
