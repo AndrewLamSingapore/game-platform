@@ -46,7 +46,7 @@ function makePrompt({campaign,lastTurn,npcs,quests}){
 
 async function rpc(name,args,auth){return supabase(`/rest/v1/rpc/${name}`,auth,{method:'POST',body:JSON.stringify(args)});}
 const publicJob=job=>job?{id:job.id,campaign_id:job.campaign_id,source_turn:job.source_turn,scene_key:job.scene_key,status:job.status,progress:job.progress,duration_seconds:job.duration_seconds,model:job.model,output_url:job.status==='READY'?job.output_url:null,media_type:job.status==='READY'?job.media_type:null,error_code:job.status==='FAILED'?job.error_code:null}:null;
-const errorCode=error=>error?.statusCode===402||error?.status===402?'budget_limit':error?.statusCode===429||error?.status===429?'rate_limited':error?.statusCode===401||error?.status===401?'gateway_auth_unavailable':'generation_failed';
+const errorCode=error=>error?.statusCode===402||error?.status===402?'budget_limit':error?.statusCode===429||error?.status===429?'rate_limited':error?.statusCode===403||error?.status===403?'gateway_forbidden':error?.statusCode===401||error?.status===401?'gateway_auth_unavailable':'generation_failed';
 
 export default async function handler(req,res){
   res.setHeader('Cache-Control','no-store');
@@ -106,6 +106,9 @@ export default async function handler(req,res){
     return res.status(400).json({error:'unsupported_action'});
   }catch(error){
     const status=Number(error?.status||error?.statusCode)||500;
-    return res.status(status>=400&&status<600?status:500).json({error:errorCode(error),message:status===429?'Cinematic limit reached. Try again tomorrow.':'The cinematic could not be prepared right now.'});
+    const code=errorCode(error);
+    console.error('[api/cinematic] request failed',{status,code,providerCode:clean(error?.code,80),providerMessage:clean(error?.message,300)});
+    const message=status===429?'Cinematic limit reached. Try again tomorrow.':status===402?'AI Gateway credits are unavailable for this cinematic.':status===403?'AI Gateway denied video generation for this account or project.':'The cinematic could not be prepared right now.';
+    return res.status(status>=400&&status<600?status:500).json({error:code,message});
   }
 }
