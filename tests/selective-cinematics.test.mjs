@@ -3,7 +3,7 @@ import fs from 'node:fs';
 const html=fs.readFileSync('index.html','utf8');
 const client=fs.readFileSync('cinematics.js','utf8');
 const api=fs.readFileSync('api/cinematic.js','utf8');
-const migration=fs.readFileSync('supabase/migrations/20260831053212_selective_cinematic_mode.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20260831055048_selective_cinematic_mode.sql','utf8');
 assert.match(html,/id="cinematicStage"/);
 assert.match(html,/id="cinematicVideo"/);
 assert.match(html,/cinematics\.js/);
