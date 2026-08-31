@@ -13,7 +13,7 @@ assert.match(client,/sourceTurn%4===0/);
 assert.match(client,/\/api\/cinematic/);
 assert.match(api,/experimental_startVideo/);
 assert.match(api,/experimental_getVideoStatus/);
-assert.match(api,/google\/veo-3\.1-lite-generate-preview/);
+assert.match(api,/google\/veo-3\.1-generate-001/);
 assert.match(api,/retry_cinematic_job/);
 assert.match(client,/Retry cinematic/);
 assert.match(api,/duration:4/);
