@@ -1,5 +1,5 @@
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const stage=document.querySelector('#cinematicStage'),vignette=document.querySelector('#cinematicVignette'),placeholder=document.querySelector('#cinematicPlaceholder'),statusText=document.querySelector('#cinematicStatus'),progress=document.querySelector('#cinematicProgress'),generate=document.querySelector('#generateCinematic'),replay=document.querySelector('#replayCinematic'),locationText=document.querySelector('#cinematicLocation'),momentText=document.querySelector('#cinematicMoment'),turnText=document.querySelector('#cinematicTurn'),castText=document.querySelector('#cinematicCast'),worldTitle=document.querySelector('#cinematicWorldTitle');
+const stage=document.querySelector('#cinematicStage'),vignette=document.querySelector('#cinematicVignette'),placeholder=document.querySelector('#cinematicPlaceholder'),statusText=document.querySelector('#cinematicStatus'),progress=document.querySelector('#cinematicProgress'),generate=document.querySelector('#generateCinematic'),replay=document.querySelector('#replayCinematic');
 let scene=null,runTimer=null,progressTimer=null,directAnimations=[];const playedThisPage=new Set();
 const pivotal=detail=>detail.sourceTurn===0||detail.sourceTurn===1||detail.sourceTurn%4===0||/(reveals?|discovers?|betray|attack|escape|dies?|truth|final|cannot be restored|changes course|hostile|collaps)/i.test(detail.lastNarrative||'');
 const clean=(value,max=220)=>String(value??'').replace(/\s+/g,' ').trim().slice(0,max);
@@ -8,12 +8,10 @@ const remembered=detail=>{try{return localStorage.getItem(memoryKey(detail))==='
 const remember=detail=>{try{localStorage.setItem(memoryKey(detail),'1')}catch{}};
 function setBusy(value){stage?.setAttribute('aria-busy',String(value));if(generate)generate.disabled=value}
 function prepare(detail){
-  const world=detail.worldState||{},names=[...document.querySelectorAll('#peoplePresent .presence-card b')].map(node=>clean(node.textContent,40)).filter(Boolean).slice(0,3);
-  locationText.textContent=clean(world.location||world.genre||'A world at the turning point',100);
-  momentText.textContent=clean(detail.lastNarrative||world.opening_label||world.premise||'The world remembers what happens next.',220);
-  turnText.textContent=`TURN ${Math.max(0,Number(detail.sourceTurn)||0)} · ESTABLISHING SHOT`;
-  castText.textContent=names.length?names.join(' · '):'THE PEOPLE PRESENT';
-  worldTitle.textContent=clean(document.querySelector('#campaignTitle')?.textContent||world.title||'The world remembers.',80);
+  const world=detail.worldState||{},cards=[...document.querySelectorAll('#peoplePresent .presence-card')].slice(0,4),portraits=document.querySelector('#cinematicPortraits');
+  const description=clean(detail.lastNarrative||world.opening_label||world.premise||'A pivotal moment changes the world.',260);
+  vignette.setAttribute('aria-label',`Visual cinematic. ${clean(world.location||world.genre||'The world',100)}. ${description}`);
+  if(portraits){portraits.replaceChildren(...cards.map((card,index)=>{const portrait=document.createElement('span'),symbol=card.querySelector('.presence-symbol')?.textContent||['✦','◆','●','◈'][index],hue=card.style.getPropertyValue('--person-hue')||String(40+index*74);portrait.textContent=symbol;portrait.style.setProperty('--portrait-hue',hue);return portrait}));if(!portraits.children.length){['✦','◆','●'].forEach((symbol,index)=>{const portrait=document.createElement('span');portrait.textContent=symbol;portrait.style.setProperty('--portrait-hue',String(42+index*100));portraits.append(portrait)})}}
 }
 function cancelAnimations(){directAnimations.forEach(animation=>{try{animation.cancel()}catch{}});directAnimations=[]}
 function animate(el,frames,options){if(!el)return;const animation=el.animate(frames,options);directAnimations.push(animation)}
@@ -25,8 +23,9 @@ function animateSequence(duration){
   animate(shots[2],[{opacity:0},{opacity:0,offset:.65},{opacity:1,offset:.76},{opacity:1}],{duration,fill:'both'});
   animate(arts[0],[{transform:'scale(1.22) translate(-3%,2%)'},{transform:'scale(1.05) translate(1%,-1%)'}],{duration:duration*.38,fill:'both',easing:'cubic-bezier(.16,.78,.2,1)'});
   animate(arts[1],[{transform:'scale(1.04) translate(2%,-1%)'},{transform:'scale(1.2) translate(-2%,1%)'}],{duration:duration*.48,delay:duration*.27,fill:'both',easing:'cubic-bezier(.2,.7,.25,1)'});
-  shots.slice(0,2).forEach((shot,index)=>animate(shot.querySelector('.shot-copy'),[{opacity:0,transform:'translateY(28px)',filter:'blur(6px)'},{opacity:1,transform:'none',filter:'blur(0)',offset:.3},{opacity:1,transform:'none',filter:'blur(0)',offset:.75},{opacity:0,transform:'translateY(-10px)',filter:'blur(3px)'}],{duration:duration*(index? .47:.37),delay:duration*(index?.28:0),fill:'both',easing:'ease-out'}));
-  animate(shots[2].querySelector('.shot-copy'),[{opacity:0,transform:'scale(.92)',letterSpacing:'.08em'},{opacity:1,transform:'scale(1)',letterSpacing:'0'}],{duration:duration*.3,delay:duration*.7,fill:'both',easing:'cubic-bezier(.16,.8,.22,1)'});
+  animate(shots[0].querySelector('.shot-prism'),[{opacity:0,transform:'translateX(-70%) skewX(-18deg)'},{opacity:.72,transform:'translateX(10%) skewX(-18deg)',offset:.5},{opacity:0,transform:'translateX(80%) skewX(-18deg)'}],{duration:duration*.38,fill:'both'});
+  animate(shots[1].querySelector('.shot-impact'),[{opacity:0,transform:'scale(.08)'},{opacity:.88,transform:'scale(1.05)',offset:.42},{opacity:0,transform:'scale(1.7)'}],{duration:duration*.47,delay:duration*.27,fill:'both',easing:'cubic-bezier(.2,.75,.2,1)'});
+  [...shots[2].querySelectorAll('.cinematic-portraits span')].forEach((portrait,index)=>animate(portrait,[{opacity:0,transform:'translateY(38px) scale(.72)'},{opacity:1,transform:'translateY(0) scale(1)',offset:.62},{opacity:.9,transform:'translateY(-4px) scale(1.04)'}],{duration:duration*.3,delay:duration*(.68+index*.035),fill:'both',easing:'cubic-bezier(.16,.8,.22,1)'}));
   animate(shots[2].querySelector('.shot-sigil'),[{opacity:0,transform:'scale(.2) rotate(-90deg)'},{opacity:.8,transform:'scale(1.3) rotate(20deg)',offset:.55},{opacity:.32,transform:'scale(1) rotate(0)'}],{duration:duration*.34,delay:duration*.66,fill:'both'});
   animate(grain,[{transform:'translate(0,0)'},{transform:'translate(-3%,2%)'},{transform:'translate(2%,-3%)'},{transform:'translate(-1%,1%)'}],{duration:420,iterations:Infinity});
   animate(vignette,[{filter:'brightness(.08)'},{filter:'brightness(1.28)',offset:.07},{filter:'brightness(.92)',offset:.34},{filter:'brightness(1.2)',offset:.39},{filter:'brightness(.9)',offset:.7},{filter:'brightness(.72)'}],{duration,fill:'both'});
