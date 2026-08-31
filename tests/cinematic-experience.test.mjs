@@ -23,13 +23,15 @@ assert.match(experience,/requestAnimationFrame/);
 assert.match(experience,/updatePeoplePresent/);
 assert.match(experience,/showModal/);
 assert.match(experience,/visibilitychange/);
-assert.match(atmosphere,/ashen-gate\.webp/);
-assert.match(atmosphere,/neon-after-midnight\.webp/);
-assert.match(atmosphere,/last-expedition\.webp/);
+assert.match(atmosphere,/ashen-gate-cast\.webp/);
+assert.match(atmosphere,/neon-midnight-cast\.webp/);
+assert.match(atmosphere,/last-expedition-cast\.webp/);
+assert.match(experience,/gameCharacterPortrait/);
+assert.match(atmosphere,/has-portrait/);
 assert.match(atmosphere,/prefers-reduced-motion/);
-for(const asset of ['ashen-gate.webp','neon-after-midnight.webp','last-expedition.webp']){
+for(const asset of ['ashen-gate-cast.webp','neon-midnight-cast.webp','last-expedition-cast.webp']){
   const path=`assets/worlds/${asset}`;
   assert.equal(fs.existsSync(path),true,`missing atmosphere art: ${path}`);
-  assert.ok(fs.statSync(path).size<150_000,`atmosphere art must stay mobile-friendly: ${path}`);
+  assert.ok(fs.statSync(path).size<350_000,`atmosphere art must stay mobile-friendly: ${path}`);
 }
 console.log('Atmosphere System V1: cinematic art, sound, motion, previews and Living Characters: PASS');

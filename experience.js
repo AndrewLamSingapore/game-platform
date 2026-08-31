@@ -5,46 +5,51 @@ const worlds={
   'ashen-gate':{
     name:'The Ashen Gate',
     genre:'Dark fantasy · 6–10 hours',
-    art:'/assets/worlds/ashen-gate.webp',
+    art:'/assets/worlds/ashen-gate-cast.webp',
     accent:'#ff9b61',
     premise:'The final gate is closing. Someone outside knows your name—and carries proof that the city was built on a lie.',
     danger:'Ash plague moves through the refugees while the gate mechanism begins its final cycle. Every person admitted changes who will survive inside.',
     atmosphere:'Ash falls beyond the wall',
     characters:[
-      ['Captain Ilyan Rook','Severe commander buying time for an evacuation'],
-      ['Sable Vey','Your returned sister, carrying forbidden proof'],
-      ['Archivist Meret','Keeper of the names erased from history']
+      ['Captain Ilyan Rook','Severe commander buying time for an evacuation',19],
+      ['Sable Vey','Your returned sister, carrying forbidden proof',41],
+      ['Archivist Meret','Keeper of the names erased from history',61],
+      ['Councillor Orr','A charming architect of controlled truth',82]
     ]
   },
   'neon-midnight':{
     name:'Neon After Midnight',
     genre:'Noir science-fiction · 6–10 hours',
-    art:'/assets/worlds/neon-after-midnight.webp',
+    art:'/assets/worlds/neon-midnight-cast.webp',
     accent:'#5ff4ff',
     premise:'A train arrives seven years late. Every passenger remembers a future that has not happened—including yours.',
     danger:'Vanta Security is sealing Platform Nine. The passengers will be erased unless you establish that their memories—and their personhood—are real.',
     atmosphere:'Rain strikes Platform Nine',
     characters:[
-      ['Inspector Orin Kade','Controlled pursuer whose daughter is on the train'],
-      ['Nia-7','Synthetic passenger carrying seven lost memories'],
-      ['Roan Mercer','A man who remembers becoming an assassin']
+      ['Inspector Orin Kade','Controlled pursuer whose daughter is on the train',28],
+      ['Nia-7','Synthetic passenger carrying seven lost memories',50],
+      ['Roan Mercer','A man who remembers becoming an assassin',72]
     ]
   },
   'last-expedition':{
     name:'The Last Expedition',
     genre:'Lost-world exploration · 6–10 hours',
-    art:'/assets/worlds/last-expedition.webp',
+    art:'/assets/worlds/last-expedition-cast.webp',
     accent:'#63e2c6',
     premise:'Your missing expedition broadcasts one final message from beneath an ocean that should not exist.',
     danger:'Containment charges are counting down while something beneath the drowned observatory reconstructs the missing explorers from memory.',
     atmosphere:'The deep answers in your voice',
     characters:[
-      ['Commander Voss','Containment leader guarding your erased order'],
-      ['Tala Quill','Field biologist who may be an ocean-made copy'],
-      ['Ren Sol Echo','A second version of you who wants Earth forgotten']
+      ['Commander Voss','Containment leader guarding your erased order',24],
+      ['Tala Quill','Field biologist who may be an ocean-made copy',50],
+      ['Ren Sol Echo','A second version of you who wants Earth forgotten',77]
     ]
   }
 };
+
+const portraitIndex=new Map();
+Object.values(worlds).forEach(world=>world.characters.forEach(([name,,x])=>portraitIndex.set(name.toLowerCase(),{art:world.art,x,y:27})));
+window.gameCharacterPortrait=name=>portraitIndex.get(String(name||'').toLowerCase())||null;
 
 const soundButton=document.createElement('button');
 soundButton.id='soundToggle';
@@ -284,14 +289,20 @@ function openPreview(card){
   document.querySelector('#previewPremise').textContent=data.premise;
   document.querySelector('#previewDanger').textContent=data.danger;
   const characters=document.querySelector('#previewCharacters');
-  characters.replaceChildren(...data.characters.map(([name,description])=>{
+  characters.replaceChildren(...data.characters.map(([name,description,x])=>{
     const item=document.createElement('div');
     item.className='preview-character';
+    const portrait=document.createElement('span');
+    portrait.className='preview-character-portrait';
+    portrait.style.setProperty('--portrait-image',`url("${data.art}")`);
+    portrait.style.setProperty('--portrait-x',`${x}%`);
     const strong=document.createElement('strong');
     const small=document.createElement('small');
     strong.textContent=name;
     small.textContent=description;
-    item.append(strong,small);
+    const copy=document.createElement('span');
+    copy.append(strong,small);
+    item.append(portrait,copy);
     return item;
   }));
   preview.showModal();
@@ -343,7 +354,7 @@ function characterIdentity(name,details=[]){
   ];
   const match=roles.find(([pattern])=>pattern.test(objective+name.toLowerCase()));
   const visual=window.gameCharacterVisual?.(name,details[0]||'',match?.[1]||'NPC');
-  return{hue:visual?.hue??Math.abs(hash)%360,role:match?.[1]||'Unknown',symbol:visual?.icon||match?.[2]||['●','■','✦','⬟'][Math.abs(hash)%4],variant:Math.abs(hash)%4,weaponIcon:visual?.weaponIcon||'🗡️',weapon:visual?.weapon||'Frontier shortblade',damage:visual?.damage||'1d6 + 1'};
+  return{hue:visual?.hue??Math.abs(hash)%360,role:match?.[1]||'Unknown',initials:visual?.initials||name.slice(0,2).toUpperCase(),portrait:window.gameCharacterPortrait?.(name),variant:Math.abs(hash)%4,weaponIcon:visual?.weaponIcon||'🗡️',weapon:visual?.weapon||'Frontier shortblade',damage:visual?.damage||'1d6 + 1'};
 }
 
 function updatePeoplePresent(){
@@ -377,7 +388,13 @@ function updatePeoplePresent(){
     const avatar=document.createElement('div');
     avatar.className='presence-avatar';
     avatar.setAttribute('aria-hidden','true');
-    avatar.innerHTML=`<span class="presence-symbol">${identity.symbol}</span><small>${name.split(/\s+/).map(part=>part[0]).join('').slice(0,2).toUpperCase()}</small>`;
+    if(identity.portrait){
+      avatar.classList.add('has-portrait');
+      avatar.style.setProperty('--portrait-image',`url("${identity.portrait.art}")`);
+      avatar.style.setProperty('--portrait-x',`${identity.portrait.x}%`);
+      avatar.style.setProperty('--portrait-y',`${identity.portrait.y}%`);
+    }
+    avatar.innerHTML=`<span class="presence-initials">${identity.initials}</span>`;
     const copy=document.createElement('div');
     const headline=document.createElement('div');
     headline.className='presence-headline';
