@@ -1,6 +1,7 @@
 const SUPABASE_URL='https://vtrfgckzpjgtmqsnumur.supabase.co';
 const SUPABASE_KEY='sb_publishable_zsgA314WZue1tlu_Kt-SDQ_UopdKMNs';
 const MODEL='openai/gpt-5.6-sol';
+// Deployment marker: forward-only world runtime.
 const clean=s=>String(s??'').replace(/\s+/g,' ').trim();
 const outputText=response=>{
  if(typeof response?.output_text==='string')return response.output_text;
