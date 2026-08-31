@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {createBot,decideBotTick} from '../src/competitive/fsm-bot.js';
+import {createGameEvent,orderEvents} from '../src/competitive/telemetry.js';
+import {updateElo,difficultyFromRating,rankCandidates} from '../src/competitive/ratings.js';
+import {inlineIntegrityCheck,detectAnomalies} from '../src/competitive/risk.js';
+import {assertCompetitiveDependency,routeSubsystem} from '../src/competitive/boundary.js';
+const bot=createBot({id:'b1',seed:42}); const a=decideBotTick(bot,{visibleEnemy:{id:'e1',distance:1},attackRange:2,selfHp:100});
+assert.equal(a.decision.action,'ATTACK');assert.equal(a.decision.state,'ENGAGE');assert.deepEqual(decideBotTick(bot,{patrolPoints:['A','B']}).decision,decideBotTick(bot,{patrolPoints:['A','B']}).decision);
+const base={event_id:'1',event_type:'PLAYER_ACTION',occurred_at:'2026-08-31T00:00:00Z',match_id:'m',actor_id:'p',sequence:1,source:'GAME_SERVER',payload:{}};
+assert.equal(createGameEvent(base).schema_version,1);assert.equal(orderEvents([{...base,event_id:'2',sequence:2},base])[0].event_id,'1');
+assert.equal(updateElo({rating:1500,games:0},{rating:1500},1).rating,1520);assert.equal(difficultyFromRating(2500).tier,'ELITE');assert.equal(rankCandidates({id:'a',rating:1500,region:'sg'},[{id:'b',rating:1510,region:'sg',latencyMs:20,waitSeconds:1}])[0].id,'b');
+assert.equal(inlineIntegrityCheck({...base,payload:{scoreDelta:2000}},{maxScoreDelta:1000}).allow,false);
+const actions=Array.from({length:10},(_,i)=>({...base,event_id:String(i),sequence:i,occurred_at:new Date(i*100).toISOString()}));assert.equal(detectAnomalies(actions).length,1);
+assert.throws(()=>assertCompetitiveDependency('LLM'));assert.equal(routeSubsystem('RPG'),'NARRATIVE_AI');assert.equal(routeSubsystem('RANKED'),'COMPETITIVE_RUNTIME');
+console.log('Competitive AI boundary: PASS');

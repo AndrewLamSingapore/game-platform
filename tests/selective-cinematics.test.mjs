@@ -10,7 +10,7 @@ assert.match(client,/game:scene-ready/);
 assert.match(client,/prefers-reduced-motion/);
 assert.match(client,/sourceTurn%4===0/);
 assert.match(client,/localStorage/);
-assert.match(client,/4000/);
+assert.match(client,/duration=reduceMotion\?2800:7600/);
 assert.doesNotMatch(client,/\/api\/cinematic/);
 assert.doesNotMatch(client,/fetch\(/);
 assert.match(css,/@keyframes livingCamera/);

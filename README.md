@@ -15,6 +15,8 @@ A persistent AI-native role-playing universe where the world remembers what the 
 - Campaign memory: episodic, semantic, decisions, quests and quest graph.
 - Living entities: player-owned PCs, autonomous NPCs, factions and items.
 - Game Systems v2: multiplayer roles/invites, world clock, rulesets, inventory/equipment, health and deterministic combat.
+- Competitive AI runtime: deterministic FSM bots, immutable server-authored telemetry, shared Elo ratings, matchmaking, adaptive difficulty and asynchronous anomaly detection.
+- Hard AI boundary: Living Characters and the Game Master never execute inside the authoritative competitive hot path.
 - Stable Spine: Action Envelope -> classification -> policy -> execution -> verification -> audit.
 - Policy states: AUTO, BOUNDED_AUTO, GATED, PROHIBITED.
 - Consequential external actions remain gated.
