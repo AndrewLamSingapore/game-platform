@@ -1,0 +1,1 @@
+import assert from 'node:assert/strict'; import { sendPortfolioEvent } from './portfolioEventClient.js'; const r=await sendPortfolioEvent({},{url:'',token:''}); assert.equal(r.sent,false); console.log('portfolio event client tests passed');
