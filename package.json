@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/ecosystem-alignment.test.mjs && node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs && node tests/competitive-ai.test.mjs && node tests/schema-contract.test.mjs && node tests/onboarding-conversion.test.mjs && node tests/cinematic-experience.test.mjs && node tests/selective-cinematics.test.mjs",
-    "check": "npm test"
+    "test": "node scripts/portfolio-contract-integrity.mjs && node tests/ecosystem-alignment.test.mjs && node tests/policy.test.mjs && node tests/gm-rules.test.mjs && node tests/game-systems.test.mjs && node tests/competitive-ai.test.mjs && node tests/schema-contract.test.mjs && node tests/onboarding-conversion.test.mjs && node tests/cinematic-experience.test.mjs && node tests/selective-cinematics.test.mjs && node server/services/portfolioSimulation.test.js && node server/services/portfolioEventClient.test.js",
+    "check": "npm test",
+    "smoke:production": "node scripts/production-smoke.mjs"
   },
   "engines": {
     "node": ">=22"

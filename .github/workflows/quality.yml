@@ -3,6 +3,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -13,4 +16,28 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
+      - run: npm ci
       - run: npm test
+  production-smoke:
+    if: github.event_name != 'pull_request'
+    needs: policy-contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Wait for Vercel Git deployment
+        if: github.event_name == 'push'
+        run: sleep 45
+      - name: Verify production
+        env:
+          GAME_PLATFORM_URL: https://game-platform-wine-nine.vercel.app
+          EXPECTED_REVISION: ${{ github.event_name == 'push' && github.sha || '' }}
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if npm run smoke:production; then exit 0; fi
+            if [ "$attempt" -lt 5 ]; then sleep 30; fi
+          done
+          exit 1
