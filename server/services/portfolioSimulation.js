@@ -17,5 +17,5 @@ export function simulateScenario(spec={}){
   return {schema_version:'1.0',simulation_id:simulationId,scenario_id:scenarioId,seed,iterations,assumptions,results,metrics:results.length===1?results[0].metrics:null,authoritative:false,real_world_proof:false,evidence_level:'E1'};
 }
 export function asPortfolioEvent(result,correlationId=null){
-  return assertContract('portfolio-event-v1',{version:'1.0',event_id:`game-${result.simulation_id}`,event_type:'game.simulation.completed',source:'game-platform',occurred_at:new Date().toISOString(),correlation_id:correlationId||result.scenario_id,subject_id:result.simulation_id,evidence_level:'E1',provenance:[`seed:${result.seed}`,`iterations:${result.iterations}`],payload:result});
+  return assertContract('portfolio-event-v1',{schema_version:'1.0.0',event_id:`game-${result.simulation_id}`,event_type:'game.simulation.completed',source:'game-platform',occurred_at:new Date().toISOString(),correlation_id:correlationId||result.scenario_id,subject_id:result.simulation_id,evidence_level:'E1',provenance:[`seed:${result.seed}`,`iterations:${result.iterations}`],payload:result});
 }
