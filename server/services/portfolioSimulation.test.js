@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import { simulateScenario, asPortfolioEvent } from './portfolioSimulation.js';
+const a=simulateScenario({seed:'same',iterations:100,baseline:10,volatility:2});
+const b=simulateScenario({seed:'same',iterations:100,baseline:10,volatility:2});
+assert.deepEqual(a.metrics,b.metrics);
+assert.equal(a.authoritative,false);
+const event=asPortfolioEvent(a,'corr-1');
+assert.equal(event.event_type,'game.simulation.completed');
+assert.equal(event.evidence_level,'E1');
+console.log('portfolio simulation tests passed');
