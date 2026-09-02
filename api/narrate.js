@@ -18,7 +18,7 @@ const narrativeSchema = {
   type: 'object',
   properties: {
     narrative: { type: 'string', maxLength: 900 },
-    choices: { type: 'array', minItems: 3, maxItems: 3, uniqueItems: true, items: { type: 'string', minLength: 8, maxLength: 160 } },
+    choices: { type: 'array', minItems:3,maxItems:3, uniqueItems: true, items: { type: 'string', minLength: 8, maxLength: 160 } },
     quest: {
       anyOf: [
         { type: 'null' },
