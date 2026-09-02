@@ -66,13 +66,14 @@ const narrativeSchema = {
 
 function fallbackChoices(state, previousChoices, lastAction) {
   const place = clean(state.location || state.scene_label || 'the current scene', 80);
-  const candidates = [
-    `Investigate the newest evidence at ${place}`,
-    `Question the nearest witness about what changed at ${place}`,
-    `Protect the party and prepare for the next threat at ${place}`,
-    `Scout a safer route beyond ${place}`,
-    `Secure an alliance before the opposition regroups`,
+  const beat = Math.max(1, Number(state?.story_progression?.beat) || Number(state?.last_turn) || 1);
+  const sets = [
+    [`Follow the fresh trail away from ${place}`, 'Confront the person who moved while you were occupied', 'Seal the exposed route before the opposition can use it'],
+    ['Shadow the opposition to learn where it regroups', 'Trade the new evidence for immediate help', `Abandon ${place} and seize the initiative elsewhere`],
+    ['Set a trap using what the last move revealed', 'Split the party to pursue both urgent leads', 'Call out the hidden adversary and force an answer'],
+    ['Rescue the witness before the next attack begins', 'Destroy the advantage the opposition just gained', 'Risk the dangerous passage that has just opened'],
   ];
+  const candidates = [...sets[beat % sets.length], ...sets[(beat + 1) % sets.length], ...sets[(beat + 2) % sets.length]];
   const forbidden = new Set([...previousChoices, lastAction].map(norm).filter(Boolean));
   return candidates.filter(choice => !forbidden.has(norm(choice))).slice(0, 3);
 }
@@ -82,9 +83,15 @@ export function deterministicFallback(context = {}, reason = 'gateway_unavailabl
   const previousChoices = Array.isArray(state.choices) ? state.choices.map(clean).filter(Boolean) : [];
   const lastAction = clean(context?.player_action, 240);
   const place = clean(state.location || state.scene_label || 'the contested ground', 100);
-  const action = lastAction || 'the party advances';
+  const beat = Math.max(1, Number(state?.story_progression?.beat) || Number(state?.last_turn) || 1);
+  const developments = [
+    'The move exposes a trail leading away from the old confrontation. The opposition withdraws with something valuable, while a witness signals from a newly opened route.',
+    'The balance breaks decisively. An ally is cut off, the safest route closes, and the opposition begins regrouping somewhere beyond sight.',
+    'A hidden participant finally acts. New evidence changes the meaning of the last encounter, but recovering the truth now carries an immediate cost.',
+    'The old standoff ends. A dangerous passage opens as the opposition loses control of the scene, forcing the party to choose what matters most.',
+  ];
   return {
-    narrative: clean(`${action} changes the balance at ${place}. A visible opening appears, but the opposition is already adapting; the party must decide whether to exploit the evidence, win help, or secure its position before the moment closes.`, 900),
+    narrative: clean(`At ${place}, ${developments[beat % developments.length]} The consequence is permanent; repeating the previous decision is no longer possible.`, 900),
     choices: fallbackChoices(state, previousChoices, lastAction),
     quest: null,
     faction_updates: [],
