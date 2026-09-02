@@ -57,6 +57,7 @@ export default async function handler(req,res){
     const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
     const action=clean(body.action,20);
     if(action==='start'){
+      if(process.env.CINEMATIC_GENERATION_ENABLED!=='true')return res.status(503).json({error:'cinematic_disabled',message:'Cinematic generation is disabled until gateway capacity is explicitly enabled.'});
       const campaignId=clean(body.campaign_id,80);
       if(!/^[0-9a-f-]{36}$/i.test(campaignId))return res.status(400).json({error:'invalid_campaign_id'});
       const context=await campaignContext(campaignId,auth,user.id);
