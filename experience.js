@@ -57,8 +57,13 @@ soundButton.className='secondary';
 soundButton.type='button';
 soundButton.setAttribute('aria-pressed','false');
 soundButton.setAttribute('aria-label','Turn cinematic soundscape on');
-soundButton.innerHTML='<span class="sound-wave" aria-hidden="true"><i></i><i></i><i></i></span><span class="label">Soundscape</span>';
-document.querySelector('body > header')?.append(soundButton);
+soundButton.innerHTML='<span class="sound-wave" aria-hidden="true"><i></i><i></i><i></i></span><span class="label">SOUND READY</span>';
+const soundStatus=document.createElement('span');
+soundStatus.id='soundStatus';
+soundStatus.setAttribute('role','status');
+soundStatus.setAttribute('aria-live','polite');
+soundStatus.textContent='Sound is ready. Select it to begin playback.';
+document.querySelector('body > header')?.append(soundButton,soundStatus);
 
 const style=document.createElement('style');
 style.textContent=`
@@ -69,6 +74,8 @@ style.textContent=`
   #soundToggle[aria-pressed="true"] i{animation:soundbar .8s ease-in-out infinite alternate}
   #soundToggle[aria-pressed="true"] i:nth-child(2){animation-delay:-.35s}
   #soundToggle[aria-pressed="true"] i:nth-child(3){animation-delay:-.6s}
+  #soundStatus{position:fixed;right:1rem;top:4.5rem;z-index:80;display:none;max-width:min(25rem,calc(100vw - 2rem));padding:.7rem .9rem;border:1px solid #ff8d8d73;border-radius:10px;background:#481313f5;color:#ffd2d2;font-size:.82rem;line-height:1.35;box-shadow:0 12px 32px #0007}
+  #soundStatus.is-error{display:block}
   #atmosphere{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.68}
   .world-card>div,.world-card>h2,.world-card>p,.world-card>span{transform:translateZ(14px)}
   @keyframes soundbar{to{height:13px}}
@@ -146,17 +153,17 @@ function rebuildAmbient(){
   clearAmbient();
   const world=currentWorld();
   if(world==='neon-midnight'){
-    noiseSource('highpass',2400,.009);
-    drone(58,.012,'triangle',.11);
-    drone(116,.004,'sine',.16);
+    noiseSource('highpass',2400,.018);
+    drone(110,.032,'triangle',.11);
+    drone(220,.014,'sine',.16);
   }else if(world==='last-expedition'){
-    noiseSource('lowpass',420,.013);
-    drone(43,.018,'sine',.055);
-    drone(86,.006,'sine',.07);
+    noiseSource('lowpass',720,.024);
+    drone(98,.036,'sine',.055);
+    drone(196,.016,'sine',.07);
   }else{
-    noiseSource('bandpass',360,.014);
-    drone(36.7,.019,'sine',.045);
-    drone(73.4,.006,'triangle',.06);
+    noiseSource('bandpass',620,.025);
+    drone(110,.038,'sine',.045);
+    drone(220,.016,'triangle',.06);
   }
 }
 
@@ -165,14 +172,14 @@ function phrase(){
   const now=audio.currentTime+.04;
   const world=currentWorld();
   if(world==='neon-midnight'){
-    [110,165,220,330].forEach((frequency,index)=>tone(frequency,now+index*.42,.5,index%2?'triangle':'sine',.014));
+    [165,220,330,440].forEach((frequency,index)=>tone(frequency,now+index*.42,.5,index%2?'triangle':'sine',.026));
   }else if(world==='last-expedition'){
-    tone(659.25,now,.9,'sine',.014);
-    tone(329.63,now+.12,1.8,'sine',.008);
+    tone(659.25,now,.9,'sine',.026);
+    tone(329.63,now+.12,1.8,'sine',.016);
   }else{
-    tone(73.42,now,3.4,'sine',.022);
-    tone(110,now+.8,2.6,'triangle',.012);
-    tone(293.66,now+2.1,1.7,'sine',.009);
+    tone(146.83,now,3.4,'sine',.035);
+    tone(220,now+.8,2.6,'triangle',.022);
+    tone(293.66,now+2.1,1.7,'sine',.017);
   }
 }
 
@@ -183,21 +190,34 @@ function schedulePhrase(){
 }
 
 async function startSound(){
-  if(!audio){
-    audio=new AudioContext();
-    master=audio.createGain();
-    const filter=audio.createBiquadFilter();
-    filter.type='lowpass';
-    filter.frequency.value=2200;
-    master.connect(filter).connect(audio.destination);
+  soundStatus.classList.remove('is-error');
+  try{
+    const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+    if(!AudioContextClass)throw new Error('Web Audio is not supported by this browser.');
+    if(!audio){
+      audio=new AudioContextClass();
+      master=audio.createGain();
+      const filter=audio.createBiquadFilter();
+      filter.type='lowpass';
+      filter.frequency.value=3200;
+      master.connect(filter).connect(audio.destination);
+    }
+    await audio.resume();
+    if(audio.state!=='running')throw new Error('The browser did not allow audio playback.');
+    master.gain.cancelScheduledValues(audio.currentTime);
+    master.gain.setTargetAtTime(1,audio.currentTime,.25);
+    soundButton.setAttribute('aria-pressed','true');
+    soundButton.setAttribute('aria-label','Turn cinematic soundscape off');
+    soundButton.querySelector('.label').textContent='PLAYING';
+    soundStatus.textContent='Cinematic soundscape is playing.';
+    rebuildAmbient();
+    schedulePhrase();
+  }catch(error){
+    stopSound();
+    const message=`Sound could not start: ${error?.message||'Check this tab’s sound permission and try again.'}`;
+    soundStatus.textContent=message;
+    soundStatus.classList.add('is-error');
   }
-  await audio.resume();
-  master.gain.cancelScheduledValues(audio.currentTime);
-  master.gain.setTargetAtTime(.8,audio.currentTime,.35);
-  soundButton.setAttribute('aria-pressed','true');
-  soundButton.setAttribute('aria-label','Turn cinematic soundscape off');
-  rebuildAmbient();
-  schedulePhrase();
 }
 
 function stopSound(){
@@ -209,10 +229,11 @@ function stopSound(){
   if(master&&audio)master.gain.setTargetAtTime(0,audio.currentTime,.18);
   soundButton.setAttribute('aria-pressed','false');
   soundButton.setAttribute('aria-label','Turn cinematic soundscape on');
+  soundButton.querySelector('.label').textContent='SOUND READY';
 }
 
-soundButton.addEventListener('click',()=>soundButton.getAttribute('aria-pressed')==='true'?stopSound():startSound());
-document.addEventListener('visibilitychange',()=>{if(!audio)return;if(document.hidden)audio.suspend();else if(soundButton.getAttribute('aria-pressed')==='true')audio.resume()});
+soundButton.addEventListener('click',()=>soundButton.getAttribute('aria-pressed')==='true'?stopSound():void startSound());
+document.addEventListener('visibilitychange',()=>{if(!audio)return;if(document.hidden){audio.suspend();stopSound()} });
 
 function parseWorldState(){
   try{return JSON.parse(document.querySelector('#world')?.textContent||'{}')}catch{return{}}
