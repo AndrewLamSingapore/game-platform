@@ -153,18 +153,23 @@ function rebuildAmbient(){
   clearAmbient();
   const world=currentWorld();
   if(world==='neon-midnight'){
-    noiseSource('highpass',2400,.018);
-    drone(110,.032,'triangle',.11);
-    drone(220,.014,'sine',.16);
+    noiseSource('highpass',1800,.05);
+    drone(196,.11,'triangle',.11);
+    drone(392,.045,'sine',.16);
   }else if(world==='last-expedition'){
-    noiseSource('lowpass',720,.024);
-    drone(98,.036,'sine',.055);
-    drone(196,.016,'sine',.07);
+    noiseSource('lowpass',1100,.055);
+    drone(174.61,.11,'sine',.055);
+    drone(261.63,.05,'sine',.07);
   }else{
-    noiseSource('bandpass',620,.025);
-    drone(110,.038,'sine',.045);
-    drone(220,.016,'triangle',.06);
+    noiseSource('bandpass',850,.055);
+    drone(196,.12,'triangle',.045);
+    drone(293.66,.05,'sine',.06);
   }
+}
+
+function audibilityCue(){
+  const now=audio.currentTime+.03;
+  [523.25,659.25,783.99].forEach((frequency,index)=>tone(frequency,now+index*.22,.38,'sine',.14));
 }
 
 function phrase(){
@@ -172,14 +177,14 @@ function phrase(){
   const now=audio.currentTime+.04;
   const world=currentWorld();
   if(world==='neon-midnight'){
-    [165,220,330,440].forEach((frequency,index)=>tone(frequency,now+index*.42,.5,index%2?'triangle':'sine',.026));
+    [220,330,440,659.25].forEach((frequency,index)=>tone(frequency,now+index*.42,.6,index%2?'triangle':'sine',.07));
   }else if(world==='last-expedition'){
-    tone(659.25,now,.9,'sine',.026);
-    tone(329.63,now+.12,1.8,'sine',.016);
+    tone(659.25,now,1.1,'sine',.075);
+    tone(329.63,now+.12,2,'sine',.045);
   }else{
-    tone(146.83,now,3.4,'sine',.035);
-    tone(220,now+.8,2.6,'triangle',.022);
-    tone(293.66,now+2.1,1.7,'sine',.017);
+    tone(196,now,3.4,'triangle',.08);
+    tone(293.66,now+.8,2.6,'triangle',.055);
+    tone(440,now+2.1,1.7,'sine',.04);
   }
 }
 
@@ -205,12 +210,13 @@ async function startSound(){
     await audio.resume();
     if(audio.state!=='running')throw new Error('The browser did not allow audio playback.');
     master.gain.cancelScheduledValues(audio.currentTime);
-    master.gain.setTargetAtTime(1,audio.currentTime,.25);
+    master.gain.setValueAtTime(.85,audio.currentTime);
     soundButton.setAttribute('aria-pressed','true');
     soundButton.setAttribute('aria-label','Turn cinematic soundscape off');
     soundButton.querySelector('.label').textContent='PLAYING';
     soundStatus.textContent='Cinematic soundscape is playing.';
     rebuildAmbient();
+    audibilityCue();
     schedulePhrase();
   }catch(error){
     stopSound();
