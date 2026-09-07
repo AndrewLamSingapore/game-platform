@@ -1,5 +1,7 @@
 # Game Platform
 
+[**Open Living Worlds ↗**](https://game-platform-wine-nine.vercel.app/) · [**Discuss this project**](https://authority-engine-app.vercel.app/contact?source=game-platform) · [**Meet Andrew Lam**](https://authority-engine-app.vercel.app/about)
+
 Independent commercial AI-native persistent role-playing platform.
 
 This product implements Shared Design Language v1 concepts independently. It has no runtime, database, secret, deployment, or code dependency on unrelated portfolio products.
