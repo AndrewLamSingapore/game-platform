@@ -1,3 +1,5 @@
+> Portfolio authority: [one current JARVIS SSOT](https://github.com/AndrewLamSingapore/prime/blob/main/governance/operational-manifest.json). This document describes this repository only; it cannot override the canonical architecture or establish live deployment status.
+
 # Simulation Kernel boundary
 
 Game Platform's deterministic competitive systems form a reusable simulation primitive while the commercial RPG remains independent.
