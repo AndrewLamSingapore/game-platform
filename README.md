@@ -4,9 +4,15 @@
 
 [**Open Living Worlds ↗**](https://game-platform-wine-nine.vercel.app/) · [**Discuss this project**](https://authority-engine-app.vercel.app/contact?source=game-platform) · [**Meet Andrew Lam**](https://authority-engine-app.vercel.app/about)
 
-Independent commercial AI-native persistent role-playing platform.
+An independent working prototype of an AI-assisted persistent role-playing platform. Commercial adoption and outcomes are not asserted.
 
-This product implements Shared Design Language v1 concepts independently. It has no runtime, database, secret, deployment, or code dependency on unrelated portfolio products.
+This product implements Shared Design Language v1 concepts independently. It owns its runtime, database, secrets and deployment. Optional portfolio event exchange and public navigation connect it to the wider work without transferring game authority.
+
+## Connected work
+
+[**Explore JARVIS PRIME**](https://authority-engine-app.vercel.app/jarvis) · [**Meet Andrew**](https://authority-engine-app.vercel.app/about) · [**Start a conversation**](https://authority-engine-app.vercel.app/contact?source=game-platform&intent=collaboration)
+
+JARVIS PRIME’s public walkthrough connects this project to Andrew’s wider work. Public navigation and enquiries do not merge accounts, data or runtime authority. Current operational evidence comes from the canonical portfolio record; this README describes source capabilities.
 
 ## Product thesis
 
