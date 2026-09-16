@@ -194,7 +194,9 @@ function schedulePhrase(){
   musicTimer=setInterval(phrase,currentWorld()==='neon-midnight'?4200:currentWorld()==='last-expedition'?7200:6100);
 }
 
+let soundRequest = 0;
 async function startSound(){
+  const request = ++soundRequest;
   soundStatus.classList.remove('is-error');
   try{
     const AudioContextClass=window.AudioContext||window.webkitAudioContext;
@@ -208,6 +210,7 @@ async function startSound(){
       master.connect(filter).connect(audio.destination);
     }
     await audio.resume();
+    if(request!==soundRequest)return;
     if(audio.state!=='running')throw new Error('The browser did not allow audio playback.');
     master.gain.cancelScheduledValues(audio.currentTime);
     master.gain.setValueAtTime(.85,audio.currentTime);
@@ -227,6 +230,7 @@ async function startSound(){
 }
 
 function stopSound(){
+  soundRequest += 1;
   clearInterval(musicTimer);
   musicTimer=null;
   clearAmbient();
@@ -236,6 +240,7 @@ function stopSound(){
   soundButton.setAttribute('aria-pressed','false');
   soundButton.setAttribute('aria-label','Turn cinematic soundscape on');
   soundButton.querySelector('.label').textContent='SOUND READY';
+  soundStatus.textContent='Sound is stopped. Select sound to play again.';
 }
 
 soundButton.addEventListener('click',()=>soundButton.getAttribute('aria-pressed')==='true'?stopSound():void startSound());
