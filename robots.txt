@@ -1,0 +1,6 @@
+# Living Worlds - public guest preview.
+User-agent: *
+Allow: /
+
+# The application is a single-page experience. Campaign state is private and is
+# reached only through authenticated, campaign-scoped API calls.
