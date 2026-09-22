@@ -27,3 +27,14 @@ test('turn outcomes are announced through a live region', () => {
   );
   assert.match(read('app.js'), /notice\('The world is advancing/);
 });
+
+test('the material redesign loads after every legacy stylesheet', () => {
+  const family = html.indexOf('/authority-family.css?v=2');
+  assert.ok(family > html.indexOf('/atmosphere.css?v=8'), 'Authority family CSS must win the cascade');
+  assert.ok(family > html.lastIndexOf('</style>'), 'Authority family CSS must follow inline legacy styles');
+  const css = read('authority-family.css');
+  for (const selector of ['.world-card', '.story-panel', '.choice', '.systems>summary']) {
+    assert.ok(css.includes(selector), `redesign owns ${selector}`);
+  }
+  assert.match(css, /@media\s*\(max-width:\s*680px\)/);
+});
