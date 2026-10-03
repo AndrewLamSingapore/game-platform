@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {DEFAULT_RULESET,normalizeStats,resolveAttack,equipItem,advanceWorldClock,deriveNpcIntent,canManageCampaign,canPlayCampaign,canViewCampaign,validateQuestEdge} from '../src/game-systems.js';
 assert.equal(DEFAULT_RULESET.dice,'d20');
 assert.deepEqual(normalizeStats({hp:12,max_hp:10}).hp,12);
@@ -10,4 +11,7 @@ assert.deepEqual(advanceWorldClock({day:1,hour:23,minute:55},10),{day:2,hour:0,m
 assert.equal(deriveNpcIntent({hp:5,disposition:-60},{threat_level:1}).intent,'confront');
 assert.equal(canManageCampaign('GM'),true);assert.equal(canManageCampaign('PLAYER'),false);assert.equal(canPlayCampaign('PLAYER'),true);assert.equal(canViewCampaign('SPECTATOR'),true);
 assert.equal(validateQuestEdge('a','b'),true);assert.equal(validateQuestEdge('a','a'),false);
+const gmTurnSource=readFileSync(new URL('../supabase/functions/gm-turn/index.ts',import.meta.url),'utf8');
+assert.doesNotMatch(gmTurnSource,/â€œ|â€|â€”|â€¢|Â·/u,'GM responses must not contain UTF-8 mojibake');
+assert.ok(gmTurnSource.includes('· Scene ${progress.scene} · Beat'),'scene label must use normal separators');
 console.log('Game Systems v2 contract: PASS');
