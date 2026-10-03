@@ -1,4 +1,4 @@
-> Portfolio authority: [one current JARVIS SSOT](https://github.com/AndrewLamSingapore/prime/blob/main/governance/operational-manifest.json). This document describes this repository only; it cannot override the canonical architecture or establish live deployment status.
+> Portfolio status authority: [PRIME STATUS.md](https://github.com/AndrewLamSingapore/prime/blob/main/STATUS.md) is the single current status source. The [operational manifest](https://github.com/AndrewLamSingapore/prime/blob/main/governance/operational-manifest.json) is a component and observation reference; it cannot establish live deployment status. This README describes this repository only.
 
 # Game Platform
 
