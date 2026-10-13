@@ -104,6 +104,12 @@ export function isDuplicateKey(error) {
   return String(error?.code || '') === '23505';
 }
 
+/** A turn cannot advance unless its idempotency key was durably reserved. */
+export function reservationDisposition(error) {
+  if (!error) return 'RESERVED';
+  return isDuplicateKey(error) ? 'DUPLICATE' : 'UNAVAILABLE';
+}
+
 /** Slim diagnostic block returned to the caller and stored with the turn. */
 export function turnDiagnostics({ auditOk, narrationLint = [] }) {
   return {

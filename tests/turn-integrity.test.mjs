@@ -7,6 +7,7 @@ import {
   isDuplicateKey,
   isMissingSchema,
   resolveCorsOrigin,
+  reservationDisposition,
   sanitizeNarration,
   turnDiagnostics,
 } from '../supabase/functions/_shared/turn-integrity.js';
@@ -76,6 +77,14 @@ test('schema and idempotency failures are classified, not swallowed', () => {
   });
 });
 
+test('reservation errors cannot be mistaken for a reserved turn', () => {
+  assert.equal(reservationDisposition(null), 'RESERVED');
+  assert.equal(reservationDisposition({ code: '23505' }), 'DUPLICATE');
+  for (const error of [{ code: '42P01' }, { code: '42501' }, { code: 'PGRST205' }, { message: 'network unavailable' }]) {
+    assert.equal(reservationDisposition(error), 'UNAVAILABLE');
+  }
+});
+
 test('the idempotency key is reserved before any authoritative mutation', () => {
   const reservation = gmTurn.indexOf('idempotency_key:idem');
   const claim = gmTurn.indexOf('claim_next_game_turn');
@@ -84,15 +93,17 @@ test('the idempotency key is reserved before any authoritative mutation', () => 
   assert.ok(reservation < claim, 'the reservation must happen before the turn is claimed');
   assert.ok(gmTurn.includes("error:'turn_in_flight'"), 'a concurrent duplicate is rejected as in-flight');
   assert.ok(gmTurn.includes('replayed:true'), 'a completed duplicate returns the stored result');
-  const duplicateCheck = gmTurn.indexOf('isDuplicateKey(reserveError)');
+  const duplicateCheck = gmTurn.indexOf('reservationDisposition(reserveError)');
   const replayLookup = gmTurn.indexOf("await admin.from('game_audit_log').select('decision_record')");
   assert.ok(duplicateCheck > -1, 'the reservation conflict is classified');
-  assert.ok(replayLookup > duplicateCheck, 'the replay lookup only runs after a duplicate-key conflict, never before mutation');
+  assert.ok(replayLookup > duplicateCheck, 'the replay lookup only runs after reservation classification, never before mutation');
+  const unavailableGuard = gmTurn.indexOf("if(reservationState==='UNAVAILABLE')return j({error:'turn_reservation_unavailable'},503);");
+  assert.ok(unavailableGuard > replayLookup && unavailableGuard < claim, 'a non-duplicate reservation error must stop before claiming a turn');
 });
 
 test('model narration is sanitised before it can become authoritative prose', () => {
   assert.ok(gmTurn.includes("from '../_shared/turn-integrity.js';"), 'gm-turn imports the shared turn-integrity helpers');
-  for (const helper of ['isDuplicateKey', 'resolveCorsOrigin', 'sanitizeNarration', 'turnDiagnostics']) {
+  for (const helper of ['reservationDisposition', 'resolveCorsOrigin', 'sanitizeNarration', 'turnDiagnostics']) {
     assert.ok(gmTurn.includes(helper), `gm-turn imports ${helper}`);
   }
   assert.ok(gmTurn.includes('sanitizeNarration(model.narrative,900)'), 'model narration passes through the sanitiser');
