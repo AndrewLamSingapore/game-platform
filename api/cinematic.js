@@ -48,7 +48,7 @@ async function rpc(name,args,auth){return supabase(`/rest/v1/rpc/${name}`,auth,{
 const publicJob=job=>job?{id:job.id,campaign_id:job.campaign_id,source_turn:job.source_turn,scene_key:job.scene_key,status:job.status,progress:job.progress,duration_seconds:job.duration_seconds,model:job.model,output_url:job.status==='READY'?job.output_url:null,media_type:job.status==='READY'?job.media_type:null,error_code:job.status==='FAILED'?job.error_code:null}:null;
 const errorCode=error=>error?.statusCode===402||error?.status===402?'budget_limit':error?.statusCode===429||error?.status===429?'rate_limited':error?.statusCode===403||error?.status===403?'gateway_forbidden':error?.statusCode===401||error?.status===401?'gateway_auth_unavailable':'generation_failed';
 
-export default async function handler(req,res){
+export default async function handler(req,res){if(process.env.VERCEL_ENV==='preview')return res.status(503).json({error:'preview_cinematics_not_commissioned'});
   res.setHeader('Cache-Control','no-store');
   if(req.method!=='POST')return res.status(405).json({error:'method_not_allowed'});
   const auth=req.headers.authorization||'';
