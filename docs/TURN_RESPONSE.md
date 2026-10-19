@@ -2,7 +2,7 @@
 
 Player decisions request an authenticated SSE response from gm-turn. AI Gateway output deltas are decoded into provisional narrative text; choices remain unavailable until the server has validated the final narration and persisted the turn. The final authoritative TurnResult replaces the draft immediately. A single RLS-preserving game_campaign_snapshot call reconciles secondary panels in the background. Snapshot results are discarded if the user changes campaigns, another turn starts, or the scene version changes.
 
-NPC agendas use a batched upsert, and independent player survival writes run concurrently. Turn writes still complete before a successful result is sent. resolved_before_audit_ms and model_ms are measured separately; neither is a browser-visible latency claim.
+NPC agendas use a batched upsert. Independent transcript, memory, clock, player/NPC, campaign and session effects share one parallel completion barrier; failures stop a success response. Stats are fetched only when a skill check needs them, and faction updates reuse the already-read campaign context. Turn writes still complete before a successful result is sent. resolved_before_audit_ms, model_ms, first_narrative_ms and effects_ms are measured separately; neither is a browser-visible latency claim.
 
 ## Concurrency and recovery
 
@@ -15,6 +15,10 @@ The guard is released in finally after success or failure. It deliberately does 
 admit_game_narration validates the authenticated identity and active OWNER/GM/PLAYER membership, then atomically counts shared PostgreSQL budgets across instances: 10 requests/minute and 100/day per user, 20/minute and 200/day per campaign, 100/minute and 2,000/day globally. Failed admission returns 429 with Retry-After; storage failure returns 503 before invoking the paid provider. The quota table denies direct client access. The deliberately exposed SECURITY DEFINER admission function and deny-by-default table can produce advisor messages; their ownership and grants are intentional.
 
 Provider routing prefers time to first token through GAME_NARRATION_PROVIDER_SORT=ttft, while retaining the existing model and fallback list. No premium service tier is requested. Provider generation has a 25-second deadline; auth, membership and quota calls have five-second deadlines. A failed provider stream falls back to the existing deterministic narration. This fallback can replace provisional text; provisional text is never canonical game state.
+
+## Region and measurement
+
+The owning Supabase database is in ap-southeast-1. Production turn requests send x-region from runtime-config to execute near that database; GAME_SUPABASE_FUNCTION_REGION can override this. Explicit regional invocation does not automatically fail over during a regional outage; adjust the configured region if needed. The first live cloud-browser check before this regional setting recorded 17,187ms before audit, including 5,722ms narration, so no final speed improvement was inferred from the first deployment. A follow-up batches the remaining independent effects and records first-narrative and effect times.
 
 ## Preview isolation
 
