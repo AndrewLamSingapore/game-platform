@@ -21,6 +21,7 @@ test('browser receives provisional text before committed result and surfaces str
 test('preview cannot default or explicitly point at the production backend',()=>{
  assert.equal(gameBackend({VERCEL_ENV:'preview'}),null);
  assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://vtrfgckzpjgtmqsnumur.supabase.co/',GAME_SUPABASE_PUBLISHABLE_KEY:'fixture'}),null);
+ assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://VTRFGCKZPJGTMQSNUMUR.supabase.co:443',GAME_SUPABASE_PUBLISHABLE_KEY:'fixture'}),null);
  assert.ok(gameBackend({VERCEL_ENV:'production'}));
  assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://isolated.supabase.co',GAME_SUPABASE_PUBLISHABLE_KEY:'fixture'}).url,'https://isolated.supabase.co');
 });
@@ -34,7 +35,7 @@ test('narration quota denies before provider invocation and storage errors fail 
 test('real narration handler streams provider deltas, then validates the completed object',async()=>{
  const original=global.fetch,previous=process.env.AI_GATEWAY_API_KEY;process.env.AI_GATEWAY_API_KEY='fixture';
  const generated={narrative:'A witness opens the gate.',choices:['Follow the new trail','Question the witness','Protect the exposed route'],quest:null,faction_updates:[],npc_updates:[]};
- try{global.fetch=async(url,options)=>{if(url.includes('/auth/'))return Response.json({id:'fixture'});if(url.includes('campaign_members'))return Response.json([{role:'OWNER'}]);if(url.includes('admit_game_narration'))return Response.json(true);assert.equal(JSON.parse(options.body).stream,true);
+ try{global.fetch=async(url,options)=>{if(url.includes('/auth/'))return Response.json({id:'fixture'});if(url.includes('campaign_members'))return Response.json([{role:'OWNER'}]);if(url.includes('admit_game_narration'))return Response.json(true);assert.equal(JSON.parse(options.body).stream,true);assert.equal(JSON.parse(options.body).reasoning.effort,'none');
  const full=JSON.stringify(generated);return new Response(bodyFrom([encodeEvent('response.output_text.delta',{type:'response.output_text.delta',delta:full.slice(0,28)}),encodeEvent('response.output_text.delta',{type:'response.output_text.delta',delta:full.slice(28)}),encodeEvent('response.completed',{type:'response.completed',response:{model:'fixture'}})]),{headers:{'content-type':'text/event-stream'}});};
  const res=fakeRes();await narrate({method:'POST',headers:{authorization:'Bearer fixture',accept:'text/event-stream'},body:{campaign_id:'fixture',context:{}}},res);
  const events=[];await consumeEvents(bodyFrom(res.chunks),(e,d)=>events.push([e,d]));assert.equal(events[0][0],'narrative');assert.equal(events.at(-1)[0],'result');assert.equal(events.at(-1)[1].narrative,generated.narrative);assert.ok(res.ended);
