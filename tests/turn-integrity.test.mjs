@@ -126,7 +126,7 @@ test('the audit-write migration is additive and idempotent', () => {
 
 test('the client can never leave the choice buttons permanently disabled', () => {
   assert.ok(app.includes('let turnInFlight=false'), 'a double-submission guard exists');
-  const submit = app.slice(app.indexOf('async function submitChoice'), app.indexOf('async function submitChoice') + 2200);
+  const submit = app.slice(app.indexOf('async function submitChoice'), app.indexOf('const renderWithCinematicSignal'));
   assert.ok(submit.includes('finally{'), 'the submit path always restores state');
   assert.ok(submit.includes('buttons.forEach(button=>button.disabled=false)') || submit.includes('document.querySelectorAll(\'.choice\')'), 'buttons are re-enabled');
   assert.ok(submit.includes('await openCampaign(campaign.id)'), 'the authoritative scene is reloaded rather than patched client-side');
