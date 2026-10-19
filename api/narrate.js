@@ -168,7 +168,7 @@ export default async function handler(req, res) {
         stream: streaming,
         input: prompt,
         max_output_tokens: 1000,
-        reasoning: { effort: 'low' },
+        reasoning: { effort: ['none','minimal','low','medium','high'].includes(process.env.GAME_NARRATION_REASONING_EFFORT)?process.env.GAME_NARRATION_REASONING_EFFORT:'none' },
         providerOptions: { gateway: { models: fallbacks, sort: ['cost','ttft','tps'].includes(process.env.GAME_NARRATION_PROVIDER_SORT)?process.env.GAME_NARRATION_PROVIDER_SORT:'ttft', user: user.id, tags: ['product:game-platform', 'feature:narration', 'env:production'] } },
         text: { format: { type: 'json_schema', name: 'gm_turn', strict: true, schema: narrativeSchema } },
       }),

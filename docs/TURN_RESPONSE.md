@@ -14,7 +14,7 @@ The guard is released in finally after success or failure. It deliberately does 
 
 admit_game_narration validates the authenticated identity and active OWNER/GM/PLAYER membership, then atomically counts shared PostgreSQL budgets across instances: 10 requests/minute and 100/day per user, 20/minute and 200/day per campaign, 100/minute and 2,000/day globally. Failed admission returns 429 with Retry-After; storage failure returns 503 before invoking the paid provider. The quota table denies direct client access. The deliberately exposed SECURITY DEFINER admission function and deny-by-default table can produce advisor messages; their ownership and grants are intentional.
 
-Provider routing prefers time to first token through GAME_NARRATION_PROVIDER_SORT=ttft, while retaining the existing model and fallback list. No premium service tier is requested. Provider generation has a 25-second deadline; auth, membership and quota calls have five-second deadlines. A failed provider stream falls back to the existing deterministic narration. This fallback can replace provisional text; provisional text is never canonical game state.
+Provider routing prefers time to first token through GAME_NARRATION_PROVIDER_SORT=ttft, while retaining the existing model and fallback list. No premium service tier is requested. Short narration uses the existing model with reasoning effort none (supported by the current model metadata); GAME_NARRATION_REASONING_EFFORT can override it. The deterministic rules and authorization remain unchanged. Provider generation has a 25-second deadline; auth, membership and quota calls have five-second deadlines. A failed provider stream falls back to the existing deterministic narration. This fallback can replace provisional text; provisional text is never canonical game state.
 
 ## Region and measurement
 
@@ -33,3 +33,5 @@ The uncommissioned local-outbox cron has been removed from vercel.json. The prod
 Deploy the additive 20261019045443_game_turn_response_controls migration before the new Edge function and Vercel client. Retain JWT verification on gm-turn and include both _shared/turn-integrity.js and _shared/turn-stream.js in its bundle. Keep the previous Edge source and Vercel deployment available for rollback. Do not remove additive database controls during an emergency rollback; the prior function does not set turn_guard and remains compatible with the new schema.
 
 Repository enforcement should require PRs, a reviewer and successful policy-contract/status checks, and disallow force pushes and branch deletion. A runbook does not enforce GitHub settings. Administration-write access is required to apply those controls.
+
+Transcript windows order equal-timestamp messages by their monotonically increasing row ID before reversing them for display, so each player action precedes its GM response.
