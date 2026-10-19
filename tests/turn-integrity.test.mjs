@@ -134,15 +134,10 @@ test('the client can never leave the choice buttons permanently disabled', () =>
   assert.ok(indexHtml.includes('id="notice" class="notice" role="status"'), 'turn outcomes are announced through a live region');
 });
 
-test('the resolved turn outcome survives the authoritative reload', () => {
-  const submit = app.slice(app.indexOf('let turnInFlight=false;'), app.indexOf('const maneuverBar'));
-  const reload = submit.indexOf('await openCampaign(campaign.id)');
-  const outcome = submit.indexOf('advanced \\u00b7 Day');
-  assert.ok(reload > -1, 'the submit path reloads the authoritative scene');
-  assert.ok(outcome > reload, 'the outcome notice is written after the reload, because opening a campaign clears the notice');
-  assert.ok(
-    !/notice\(`Turn \$\{data\.turn\} advanced/.test(submit.slice(0, reload)),
-    'the outcome is no longer written before the reload that clears it',
-  );
-  assert.ok(submit.includes("notice('That scene had already moved on."), 'a stale scene is reported after the reload');
+test('committed result is shown before the nonblocking snapshot reconciliation', () => {
+ const submit = app.slice(app.indexOf('let turnInFlight=false;'), app.indexOf('const renderWithCinematicSignal'));
+ assert.ok(submit.includes('showCommittedTurn(data,action);void openCampaign('));
+ assert.ok(submit.includes('background:true,expectedTurn:data.turn'));
+ assert.ok(app.includes("db.rpc('game_campaign_snapshot'"));
+ assert.ok(app.includes('Number(campaign.world_state?.last_turn||0)!==expectedTurn'));
 });

@@ -19,7 +19,7 @@ function loadCampaignForm(insertResult, openCampaign = async () => {}) {
     window: {}, document: { querySelector: element, querySelectorAll: selector => selector === '.starter' ? starters : [], createElement: element },
     setTimeout, crypto: { randomUUID: () => 'id' }, openCampaignForTest: openCampaign,
   });
-  const source = readFileSync(new URL('../app.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, '');
+  const source = readFileSync(new URL('../app.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, '').replace(/const backendResponse=[\s\S]*?const db=/, "const SUPABASE_URL='fixture',SUPABASE_KEY='fixture';const db=");
   vm.runInContext(source, context);
   vm.runInContext("user={id:'guest-1'}; openCampaign=openCampaignForTest", context);
   const submitter = element('submit');

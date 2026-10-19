@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'https://vtrfgckzpjgtmqsnumur.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_zsgA314WZue1tlu_Kt-SDQ_UopdKMNs';
+import { gameBackend } from '../lib/game-backend.js';
+import { consumeEvents, encodeEvent, partialNarrative } from '../supabase/functions/_shared/turn-stream.js';
 const DEFAULT_MODEL = 'openai/gpt-5.4-nano';
 const DEFAULT_FALLBACK_MODELS = ['google/gemini-3.6-flash', 'alibaba/qwen3.7-flash'];
 
@@ -123,21 +123,31 @@ function validateOutput(out, previousChoices, lastAction) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
+  const backend=gameBackend();if(!backend)return res.status(503).json({error:'preview_backend_not_configured'});
+  const SUPABASE_URL=backend.url,SUPABASE_KEY=backend.key;
+  res.setHeader('Cache-Control','no-store');
   const auth = req.headers.authorization || '';
   if (!auth.startsWith('Bearer ')) return res.status(401).json({ error: 'unauthorized' });
 
-  const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: { apikey: SUPABASE_KEY, Authorization: auth } });
+  const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, { signal:AbortSignal.timeout(5000),headers: { apikey: SUPABASE_KEY, Authorization: auth } });
   if (!userResponse.ok) return res.status(401).json({ error: 'unauthorized' });
   const user = await userResponse.json();
   const body = req.body || {};
   const campaignId = clean(body.campaign_id, 80);
   if (!campaignId) return res.status(400).json({ error: 'campaign_id_required' });
 
-  const membershipResponse = await fetch(`${SUPABASE_URL}/rest/v1/campaign_members?campaign_id=eq.${encodeURIComponent(campaignId)}&user_id=eq.${encodeURIComponent(user.id)}&status=eq.ACTIVE&select=role&limit=1`, { headers: { apikey: SUPABASE_KEY, Authorization: auth, Accept: 'application/json' } });
+  const membershipResponse = await fetch(`${SUPABASE_URL}/rest/v1/campaign_members?campaign_id=eq.${encodeURIComponent(campaignId)}&user_id=eq.${encodeURIComponent(user.id)}&status=eq.ACTIVE&select=role&limit=1`, { signal:AbortSignal.timeout(5000),headers: { apikey: SUPABASE_KEY, Authorization: auth, Accept: 'application/json' } });
   if (!membershipResponse.ok) return res.status(403).json({ error: 'campaign_access_denied' });
   const memberships = await membershipResponse.json();
   if (!['OWNER', 'GM', 'PLAYER'].includes(memberships?.[0]?.role)) return res.status(403).json({ error: 'player_role_required' });
 
+  const quota=await fetch(`${SUPABASE_URL}/rest/v1/rpc/admit_game_narration`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:auth,'Content-Type':'application/json'},body:JSON.stringify({p_campaign_id:campaignId}),signal:AbortSignal.timeout(5000)});
+  if(!quota.ok)return res.status(503).json({error:'narration_admission_unavailable'});
+  if(await quota.json()!==true){res.setHeader('Retry-After','60');return res.status(429).json({error:'narration_rate_limited'});}
+  const streaming=String(req.headers.accept||'').includes('text/event-stream');
+  let streamStarted=false;
+  const emit=(event,data)=>{if(!streamStarted){res.setHeader('Content-Type','text/event-stream');res.setHeader('X-Accel-Buffering','no');res.flushHeaders?.();streamStarted=true;}res.write(encodeEvent(event,data));};
+  const finish=value=>{if(!streaming)return res.status(200).json(value);emit('result',value);return res.end();};
   const context = body.context || {};
   const state = context?.campaign?.world_state || {};
   const previousChoices = Array.isArray(state.choices) ? state.choices.map(clean).filter(Boolean) : [];
@@ -145,7 +155,7 @@ export default async function handler(req, res) {
   const serializedContext = JSON.stringify(context).slice(0, 12000);
   const prompt = `You are the AI GM for a persistent tabletop RPG. Continue the story forward from the player's selected action. Preserve canon, named characters, location, world time, NPC motivations, quests, factions, combat and checks. The selected action must cause a concrete visible consequence. Never reset or replay the previous scene. Return a vivid new situation and exactly three materially different next actions grounded in that new situation. Never reuse or lightly paraphrase a previous choice or the selected action. Previous choices: ${JSON.stringify(previousChoices)}. Selected action: ${JSON.stringify(lastAction)}. Progression: ${JSON.stringify(state.story_progression || {})}. Keep narrative <=900 characters. Each choice begins with an action verb. Campaign context: ${serializedContext}`;
   const token = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
-  if (!token) return res.status(200).json(deterministicFallback(context, 'gateway_auth_unavailable'));
+  if (!token) return finish(deterministicFallback(context, 'gateway_auth_unavailable'));
 
   const { model, fallbacks } = gatewayModels();
   try {
@@ -155,10 +165,11 @@ export default async function handler(req, res) {
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
+        stream: streaming,
         input: prompt,
         max_output_tokens: 1000,
         reasoning: { effort: 'low' },
-        providerOptions: { gateway: { models: fallbacks, sort: 'cost', user: user.id, tags: ['product:game-platform', 'feature:narration', 'env:production'] } },
+        providerOptions: { gateway: { models: fallbacks, sort: ['cost','ttft','tps'].includes(process.env.GAME_NARRATION_PROVIDER_SORT)?process.env.GAME_NARRATION_PROVIDER_SORT:'ttft', user: user.id, tags: ['product:game-platform', 'feature:narration', 'env:production'] } },
         text: { format: { type: 'json_schema', name: 'gm_turn', strict: true, schema: narrativeSchema } },
       }),
       signal: AbortSignal.timeout(25000),
@@ -166,17 +177,24 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const detail = clean(await response.text(), 300);
       console.error(JSON.stringify({ level: 'error', message: 'narration_gateway_failed', route: '/api/narrate', status: response.status, model, duration_ms: Date.now() - started, detail }));
-      if ([402, 403, 429, 500, 502, 503, 504].includes(response.status)) return res.status(200).json(deterministicFallback(context, `gateway_${response.status}`));
+      if ([402, 403, 429, 500, 502, 503, 504].includes(response.status)) return finish(deterministicFallback(context, `gateway_${response.status}`));
       return res.status(503).json({ error: 'ai_gm_unavailable' });
     }
-    const raw = await response.json();
-    const text = clean(outputText(raw));
+    let raw, text;
+    if(streaming){let full='',completed=false;
+      await consumeEvents(response.body,(_event,event)=>{
+        if(event.type==='response.output_text.delta'){full+=event.delta||'';if(full.length>30000)throw Error('model_output_too_large');const narrative=partialNarrative(full);if(narrative)emit('narrative',{text:narrative,provisional:true});}
+        if(event.type==='response.completed'){completed=true;raw=event.response;}
+        if(['response.failed','response.incomplete','error'].includes(event.type))throw Error('model_stream_failed');
+      });
+      if(!completed)throw Error('model_stream_incomplete');text=clean(full||outputText(raw));
+    }else{raw=await response.json();text=clean(outputText(raw));}
     if (!text) throw new Error('empty_model_output');
     const out = validateOutput(JSON.parse(text), previousChoices, lastAction);
-    console.log(JSON.stringify({ level: 'info', message: 'narration_completed', route: '/api/narrate', model: raw.model || model, duration_ms: Date.now() - started }));
-    return res.status(200).json(out);
+    console.log(JSON.stringify({ level: 'info', message: 'narration_completed', route: '/api/narrate', model: raw?.model || model, duration_ms: Date.now() - started }));
+    return finish(out);
   } catch (error) {
     console.error(JSON.stringify({ level: 'error', message: 'narration_generation_failed', route: '/api/narrate', error: error instanceof Error ? error.message : String(error) }));
-    return res.status(200).json(deterministicFallback(context, 'gateway_exception'));
+    return finish(deterministicFallback(context, 'gateway_exception'));
   }
 }
