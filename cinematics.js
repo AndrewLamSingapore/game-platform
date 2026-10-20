@@ -1,6 +1,6 @@
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const stage=document.querySelector('#cinematicStage'),vignette=document.querySelector('#cinematicVignette'),placeholder=document.querySelector('#cinematicPlaceholder'),statusText=document.querySelector('#cinematicStatus'),progress=document.querySelector('#cinematicProgress'),generate=document.querySelector('#generateCinematic'),replay=document.querySelector('#replayCinematic');
-let scene=null,runTimer=null,progressTimer=null,directAnimations=[];const playedThisPage=new Set();
+let scene=null,runTimer=null,progressTimer=null,autoplayTimer=null,directAnimations=[];const playedThisPage=new Set();
 const pivotal=detail=>detail.sourceTurn===0||detail.sourceTurn===1||detail.sourceTurn%4===0||/(reveals?|discovers?|betray|attack|escape|dies?|truth|final|cannot be restored|changes course|hostile|collaps)/i.test(detail.lastNarrative||'');
 const clean=(value,max=220)=>String(value??'').replace(/\s+/g,' ').trim().slice(0,max);
 const memoryKey=detail=>`gp-cinematic:${detail.campaignId}:${detail.sourceTurn}`;
@@ -31,11 +31,14 @@ function animateSequence(duration){
   animate(vignette,[{filter:'brightness(.08)'},{filter:'brightness(1.28)',offset:.07},{filter:'brightness(.92)',offset:.34},{filter:'brightness(1.2)',offset:.39},{filter:'brightness(.9)',offset:.7},{filter:'brightness(.72)'}],{duration,fill:'both'});
 }
 function showReady(){prepare(scene);placeholder.hidden=true;vignette.hidden=false;generate.hidden=true;replay.hidden=false;progress.hidden=true;statusText.textContent='Living cinematic ready';setBusy(false)}
-function render(){if(!stage||!scene)return;const eligible=pivotal(scene),ready=remembered(scene);stage.hidden=!eligible&&!ready;if(stage.hidden)return;prepare(scene);if(ready){showReady();if(!playedThisPage.has(scene.key)){playedThisPage.add(scene.key);setTimeout(play,180)}return}vignette.hidden=true;placeholder.hidden=false;generate.hidden=false;replay.hidden=true;progress.hidden=true;statusText.textContent='Pivotal moment detected';setBusy(false)}
+function render(){if(!stage||!scene)return;const eligible=pivotal(scene),ready=remembered(scene);stage.hidden=!eligible&&!ready;if(stage.hidden)return;prepare(scene);if(ready){showReady();if(!playedThisPage.has(scene.key)){playedThisPage.add(scene.key);autoplayTimer=setTimeout(()=>{autoplayTimer=null;play()},180)}return}vignette.hidden=true;placeholder.hidden=false;generate.hidden=false;replay.hidden=true;progress.hidden=true;statusText.textContent='Pivotal moment detected';setBusy(false)}
 function play(){
   if(!scene)return;playedThisPage.add(scene.key);clearTimeout(runTimer);clearInterval(progressTimer);prepare(scene);placeholder.hidden=true;vignette.hidden=false;generate.hidden=true;replay.hidden=true;progress.hidden=false;progress.value=0;const duration=reduceMotion?2800:7600;statusText.textContent=reduceMotion?'Reduced-motion cinematic playing…':'Living cinematic playing…';setBusy(true);vignette.classList.remove('is-playing');void vignette.offsetWidth;vignette.classList.add('is-playing');animateSequence(duration);
   const started=performance.now();progressTimer=setInterval(()=>{progress.value=Math.min(100,((performance.now()-started)/duration)*100)},80);
   runTimer=setTimeout(()=>{clearInterval(progressTimer);progress.value=100;statusText.textContent='Living cinematic remembered';replay.hidden=false;progress.hidden=true;setBusy(false);remember(scene)},duration+100);
 }
-function load(detail){const key=`${detail.campaignId}:${detail.sourceTurn}`;if(scene?.key===key)return;scene={...detail,key};render()}
+function stopPlayback(){clearTimeout(runTimer);clearTimeout(autoplayTimer);clearInterval(progressTimer);runTimer=null;autoplayTimer=null;progressTimer=null;cancelAnimations();vignette?.classList.remove('is-playing');setBusy(false)}
+function load(detail){const key=`${detail.campaignId}:${detail.sourceTurn}`;if(scene?.key===key)return;stopPlayback();scene={...detail,key};render()}
 generate?.addEventListener('click',play);replay?.addEventListener('click',play);document.addEventListener('game:scene-ready',event=>load(event.detail));
+
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stopPlayback();if(replay)replay.hidden=false;if(progress)progress.hidden=true}});
