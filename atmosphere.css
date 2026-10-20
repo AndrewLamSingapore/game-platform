@@ -724,3 +724,8 @@ body[data-visibility="NEAR_ZERO"] main{filter:brightness(.72) contrast(1.14)}
 body[data-visibility="DARK"] main{filter:brightness(.82)}
 body[data-phase="NIGHT"] .scene-shell,body[data-weather="RAIN"] .scene-shell{box-shadow:0 28px 90px rgba(0,0,12,.62),inset 0 0 80px rgba(90,110,180,.05)}
 @media(prefers-reduced-motion:reduce){body::after{transition:none}}
+
+/* Higgsfield introductions retain world artwork while video loads. */
+.preview-cinematic{position:relative;display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#070810;z-index:1}
+.preview-art:has(.preview-cinematic:not([hidden])){display:block}
+.preview-art:has(.preview-cinematic:not([hidden])) .preview-copy{position:relative;z-index:2;background:#090b12;padding:20px}

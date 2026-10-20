@@ -2,6 +2,8 @@ import { requestTurn } from './src/turn-client.js';
 import { createGuestRecovery } from './src/guest-recovery.js';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const backendResponse=await fetch('/api/runtime-config',{cache:'no-store'});if(!backendResponse.ok){document.querySelector('#notice').textContent='This preview needs a separate game backend before play is available.';throw Error('game_backend_not_configured');}const backendConfig=await backendResponse.json();const SUPABASE_URL=backendConfig.supabaseUrl,SUPABASE_KEY=backendConfig.supabaseKey;const db=createClient(SUPABASE_URL,SUPABASE_KEY),$=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));let user=null,campaign=null,role=null,cache={},guestLoginInFlight=false,selectedStarter=null;
+// Session stays in memory and is sent only to the same-origin cinematic API.
+window.gameCinematicSession=async()=>{const {data:{session}}=await db.auth.getSession();return session?.access_token||null;};
 const STARTER_IDS={ashen:'ashen-gate',neon:'neon-midnight',expedition:'last-expedition'};
 function characterVisual(name='',archetype='',kind='NPC'){
   const seed=`${name}|${archetype}|${kind}`;let hash=2166136261;

@@ -301,6 +301,17 @@ document.querySelectorAll('.world-card').forEach(card=>{
 
 const preview=document.querySelector('#worldPreview');
 const previewArt=preview?.querySelector('.preview-art');
+const previewVideo=document.createElement('video');
+previewVideo.controls=true;previewVideo.playsInline=true;previewVideo.preload='none';previewVideo.hidden=true;
+previewVideo.className='preview-cinematic';previewVideo.setAttribute('aria-label','World introduction cinematic');
+previewArt?.prepend(previewVideo);
+const worldCinematics=fetch('/assets/worlds/cinematics/manifest.json').then(r=>r.ok?r.json():{}).catch(()=>({}));
+let previewVersion=0;
+function stopPreviewVideo(){previewVersion++;previewVideo.pause();previewVideo.removeAttribute('src');previewVideo.load();previewVideo.hidden=true;}
+previewVideo.addEventListener('error',()=>{previewVideo.hidden=true;});
+preview?.addEventListener('close',stopPreviewVideo);
+preview?.addEventListener('cancel',stopPreviewVideo);
+
 const previewClose=preview?.querySelector('.preview-close');
 const previewCancel=document.querySelector('#previewCancel');
 const enterWorld=document.querySelector('#enterWorld');
@@ -313,7 +324,15 @@ function closePreview(){
 }
 
 function openPreview(card){
+  stopPreviewVideo();
   selectedCard=card;
+  const currentPreview=previewVersion;
+  worldCinematics.then(videos=>{
+    const url=videos[card.dataset.world];
+    if(currentPreview!==previewVersion||!preview.open||typeof url!=='string'||!/^\/assets\/worlds\/cinematics\/[a-z-]+\.mp4$/.test(url))return;
+    previewVideo.src=url;previewVideo.hidden=false;
+    // User controls playback; reduced-motion preference never triggers autoplay.
+  });
   const data=worlds[card.dataset.world];
   if(!data)return;
   applyWorld(card.dataset.world);

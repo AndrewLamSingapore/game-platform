@@ -1,15 +1,16 @@
 import {createHash} from 'node:crypto';
-import {gateway,experimental_startVideo as startVideo,experimental_getVideoStatus as getVideoStatus} from 'ai';
+import {gateway,experimental_getVideoStatus as getVideoStatus} from 'ai';
+import {higgsfieldConfigured,startHiggsfieldVideo,getHiggsfieldVideo} from '../lib/higgsfield-video.js';
+import {gameBackend} from '../lib/game-backend.js';
+import {worldImageUrl} from '../lib/cinematic-worlds.js';
 
-const SUPABASE_URL='https://vtrfgckzpjgtmqsnumur.supabase.co';
-const SUPABASE_KEY='sb_publishable_zsgA314WZue1tlu_Kt-SDQ_UopdKMNs';
-const MODEL=process.env.CINEMATIC_VIDEO_MODEL||'google/veo-3.1-generate-001';
+const MODEL='google/veo-3.1-generate-001'; // Poll retained legacy jobs only.
 const clean=(value,max=800)=>String(value??'').replace(/\s+/g,' ').trim().slice(0,max);
-const dbHeaders=auth=>({apikey:SUPABASE_KEY,Authorization:auth,'Content-Type':'application/json',Accept:'application/json'});
+const dbHeaders=auth=>({apikey:gameBackend()?.key,Authorization:auth,'Content-Type':'application/json',Accept:'application/json'});
 const one=value=>Array.isArray(value)?value[0]:value;
 
 async function supabase(path,auth,options={}){
-  const response=await fetch(`${SUPABASE_URL}${path}`,{...options,headers:{...dbHeaders(auth),...(options.headers||{})}});
+  const response=await fetch(`${gameBackend().url}${path}`,{...options,redirect:'error',signal:AbortSignal.timeout(8000),headers:{...dbHeaders(auth),...(options.headers||{})}});
   const body=await response.json().catch(()=>({}));
   if(!response.ok){const error=new Error(clean(body?.message||body?.error||'database_request_failed',240));error.status=response.status;error.code=body?.code;throw error;}
   return body;
@@ -41,23 +42,31 @@ function makePrompt({campaign,lastTurn,npcs,quests}){
   const consequence=clean(lastTurn?.content||state.opening_label||state.premise||'The world opens on a consequential choice.',620);
   const characters=npcs.map(n=>`${clean(n.name,60)} (${clean(n.state?.archetype||'watchful character',80)})`).join(', ');
   const objectives=quests.map(q=>`${clean(q.title,80)}: ${clean(q.objective?.text,120)}`).join('; ');
-  return clean(`Create a four-second cinematic establishing shot for an original fictional role-playing game. World: ${clean(campaign.title,120)}. Genre: ${clean(state.genre,120)}. Location: ${clean(state.location,160)}. Current consequence: ${consequence}. ${characters?`Characters in the world: ${characters}.`:''} ${objectives?`Active objective: ${objectives}.`:''} One coherent action, strong environmental motion, cinematic lighting, restrained camera movement, readable silhouettes, no dialogue, no captions, no logos, no interface, no real people, no copyrighted characters.`,1500);
+  return clean(`Animate the supplied original world artwork into a cinematic establishing shot for an original fictional role-playing game. World: ${clean(campaign.title,120)}. Genre: ${clean(state.genre,120)}. Location: ${clean(state.location,160)}. Current consequence: ${consequence}. ${characters?`Characters in the world: ${characters}.`:''} ${objectives?`Active objective: ${objectives}.`:''} One coherent action, strong environmental motion, cinematic lighting, restrained camera movement, readable silhouettes, no dialogue, no captions, no logos, no interface, no real people, no copyrighted characters.`,1500);
 }
 
-async function rpc(name,args,auth){return supabase(`/rest/v1/rpc/${name}`,auth,{method:'POST',body:JSON.stringify(args)});}
+async function rpc(name,args,userId){
+  const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const response=await fetch(`${gameBackend().url}/rest/v1/rpc/server_${name}`,{method:'POST',signal:AbortSignal.timeout(8000),headers:{apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json'},body:JSON.stringify({...args,p_user_id:userId})});
+  const body=await response.json().catch(()=>({}));
+  if(!response.ok)throw Object.assign(new Error('cinematic_storage_failed'),{status:response.status,code:body.code});
+  return body;
+}
 const publicJob=job=>job?{id:job.id,campaign_id:job.campaign_id,source_turn:job.source_turn,scene_key:job.scene_key,status:job.status,progress:job.progress,duration_seconds:job.duration_seconds,model:job.model,output_url:job.status==='READY'?job.output_url:null,media_type:job.status==='READY'?job.media_type:null,error_code:job.status==='FAILED'?job.error_code:null}:null;
-const errorCode=error=>error?.statusCode===402||error?.status===402?'budget_limit':error?.statusCode===429||error?.status===429?'rate_limited':error?.statusCode===403||error?.status===403?'gateway_forbidden':error?.statusCode===401||error?.status===401?'gateway_auth_unavailable':'generation_failed';
+const errorCode=error=>error?.statusCode===402||error?.status===402?'budget_limit':error?.statusCode===429||error?.status===429?'rate_limited':error?.statusCode===403||error?.status===403?'provider_forbidden':error?.statusCode===401||error?.status===401?'provider_auth_unavailable':'generation_failed';
 
-export default async function handler(req,res){if(process.env.VERCEL_ENV==='preview')return res.status(503).json({error:'preview_cinematics_not_commissioned'});
+export default async function handler(req,res){
   res.setHeader('Cache-Control','no-store');
   if(req.method!=='POST')return res.status(405).json({error:'method_not_allowed'});
+  if(!gameBackend())return res.status(503).json({error:'preview_backend_not_configured'});
   const auth=req.headers.authorization||'';
   try{
     const user=await authenticate(auth);
-    const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
+    let body;try{body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};}catch{return res.status(400).json({error:'invalid_json'});}
     const action=clean(body.action,20);
     if(action==='start'){
-      if(process.env.CINEMATIC_GENERATION_ENABLED!=='true')return res.status(503).json({error:'cinematic_disabled',message:'Cinematic generation is disabled until gateway capacity is explicitly enabled.'});
+      if(process.env.CINEMATIC_GENERATION_ENABLED!=='true')return res.status(503).json({error:'cinematic_disabled',message:'Video generation is not enabled for this game yet.'});
+      if(!higgsfieldConfigured()||!process.env.SUPABASE_SERVICE_ROLE_KEY)return res.status(503).json({error:'cinematic_not_configured',message:'Video generation is not configured yet.'});
       const campaignId=clean(body.campaign_id,80);
       if(!/^[0-9a-f-]{36}$/i.test(campaignId))return res.status(400).json({error:'invalid_campaign_id'});
       const context=await campaignContext(campaignId,auth,user.id);
@@ -66,19 +75,22 @@ export default async function handler(req,res){if(process.env.VERCEL_ENV==='prev
       const prompt=makePrompt(context);
       const fingerprint=createHash('sha256').update(prompt).digest('hex');
       const starter=clean(context.campaign.world_state?.starter_id||'custom',80).replace(/[^a-z0-9-]/gi,'-').toLowerCase();
-      const reserved=await rpc('reserve_cinematic_job',{p_campaign_id:campaignId,p_source_turn:sourceTurn,p_scene_key:`${starter}:turn-${sourceTurn}`,p_prompt_fingerprint:fingerprint},auth);
+      const reserved=await rpc('reserve_cinematic_job',{p_campaign_id:campaignId,p_source_turn:sourceTurn,p_scene_key:`${starter}:turn-${sourceTurn}`,p_prompt_fingerprint:fingerprint},user.id);
       let reservedJob=reserved?.job;
       if(!reserved?.created&&reservedJob?.status==='FAILED'){
-        reservedJob=one(await rpc('retry_cinematic_job',{p_job_id:reservedJob.id},auth));
+        reservedJob=one(await rpc('retry_cinematic_job',{p_job_id:reservedJob.id},user.id));
       }else if(!reserved?.created){
         return res.status(200).json({job:publicJob(reservedJob),cached:true});
       }
+      let submitted=false;
       try{
-        const started=await startVideo({model:gateway.video(MODEL),prompt,duration:4,aspectRatio:'16:9',generateAudio:false,maxRetries:1,providerOptions:{gateway:{user:user.id,tags:['feature:selective-cinematic','product:game-platform']}}});
-        const queued=one(await rpc('transition_cinematic_job',{p_job_id:reservedJob.id,p_status:'QUEUED',p_operation:started.operation},auth));
+        const started=await startHiggsfieldVideo({prompt,imageUrl:worldImageUrl(context.campaign.world_state?.starter_id)});
+        submitted=true;
+        const queued=one(await rpc('transition_cinematic_job',{p_job_id:reservedJob.id,p_status:'QUEUED',p_operation:started},user.id));
         return res.status(202).json({job:publicJob(queued),cached:false});
       }catch(error){
-        await rpc('transition_cinematic_job',{p_job_id:reservedJob.id,p_status:'FAILED',p_error_code:errorCode(error)},auth).catch(()=>{});
+        // Unknown submission outcomes stay reserved to prevent an accidental second charge.
+        if(!submitted&&Number(error.status)>=400&&Number(error.status)<500)await rpc('transition_cinematic_job',{p_job_id:reservedJob.id,p_status:'FAILED',p_error_code:errorCode(error)},user.id).catch(()=>{});
         throw error;
       }
     }
@@ -89,27 +101,31 @@ export default async function handler(req,res){if(process.env.VERCEL_ENV==='prev
       let job=jobs?.[0];
       if(!job)return res.status(404).json({error:'cinematic_job_not_found'});
       if(['READY','FAILED'].includes(job.status))return res.status(200).json({job:publicJob(job),cached:true});
+      if(job.requested_by!==user.id)return res.status(403).json({error:'cinematic_job_access_denied'});
+      if(!process.env.SUPABASE_SERVICE_ROLE_KEY)return res.status(503).json({error:'cinematic_not_configured'});
       if(!job.operation)return res.status(200).json({job:publicJob(job)});
-      const result=await getVideoStatus(gateway.video(job.model||MODEL),{operation:job.operation,maxRetries:1});
+      const result=job.operation.provider==='higgsfield'
+        ?await getHiggsfieldVideo(job.operation)
+        :await getVideoStatus(gateway.video(job.model||MODEL),{operation:job.operation,maxRetries:1});
       if(result.status==='pending'){
-        job=one(await rpc('transition_cinematic_job',{p_job_id:job.id,p_status:'PROCESSING'},auth));
+        job=one(await rpc('transition_cinematic_job',{p_job_id:job.id,p_status:'PROCESSING'},user.id));
         return res.status(200).json({job:publicJob(job)});
       }
       if(result.status==='error'){
-        job=one(await rpc('transition_cinematic_job',{p_job_id:job.id,p_status:'FAILED',p_error_code:'provider_failed'},auth));
+        job=one(await rpc('transition_cinematic_job',{p_job_id:job.id,p_status:'FAILED',p_error_code:'provider_failed'},user.id));
         return res.status(200).json({job:publicJob(job)});
       }
-      const generated=result.videos?.find(item=>item?.type==='url'&&/^https:\/\//i.test(item.url));
-      if(!generated){job=one(await rpc('transition_cinematic_job',{p_job_id:job.id,p_status:'FAILED',p_error_code:'unsupported_video_result'},auth));return res.status(200).json({job:publicJob(job)});}
-      job=one(await rpc('transition_cinematic_job',{p_job_id:job.id,p_status:'READY',p_output_url:generated.url,p_media_type:generated.mediaType||'video/mp4'},auth));
+      const generated=result.url?{url:result.url,mediaType:result.mediaType}:result.videos?.find(item=>item?.type==='url'&&/^https:\/\//i.test(item.url));
+      if(!generated){job=one(await rpc('transition_cinematic_job',{p_job_id:job.id,p_status:'FAILED',p_error_code:'unsupported_video_result'},user.id));return res.status(200).json({job:publicJob(job)});}
+      job=one(await rpc('transition_cinematic_job',{p_job_id:job.id,p_status:'READY',p_output_url:generated.url,p_media_type:generated.mediaType||'video/mp4'},user.id));
       return res.status(200).json({job:publicJob(job)});
     }
     return res.status(400).json({error:'unsupported_action'});
   }catch(error){
     const status=Number(error?.status||error?.statusCode)||500;
     const code=errorCode(error);
-    console.error('[api/cinematic] request failed',{status,code,providerCode:clean(error?.code,80),providerMessage:clean(error?.message,300)});
-    const message=status===429?'Cinematic limit reached. Try again tomorrow.':status===402?'AI Gateway credits are unavailable for this cinematic.':status===403?'AI Gateway denied video generation for this account or project.':'The cinematic could not be prepared right now.';
+    console.error('[api/cinematic] request failed',{status,code,providerCode:clean(error?.code,80),providerError:clean(error?.code||'request_failed',80)});
+    const message=status===429?'Cinematic limit reached. Try again tomorrow.':status===402?'Higgsfield credits are unavailable for this cinematic.':status===403?'Higgsfield denied video generation for this account or project.':'The cinematic could not be prepared right now.';
     return res.status(status>=400&&status<600?status:500).json({error:code,message});
   }
 }
