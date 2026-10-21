@@ -1,0 +1,124 @@
+{
+  "format": 1,
+  "baseline": "20261021034040_independent_fresh_baseline.sql",
+  "template_sha256": "cdf137d5063195ea7ff8a8a578e6ac3180c0d8fb4e6f3bbbc761c8ce751e741a",
+  "repair": "20261021012412_restore_reproducible_game_schema.sql",
+  "inputs": [
+    {
+      "file": "0001_game_platform_v1.sql",
+      "sha256": "6950f489077d8f079f95eea54dec512372f919638d3513f647f6d17aa0e0fb63"
+    },
+    {
+      "file": "0002_private_alpha_sessions.sql",
+      "sha256": "b680a8bd73a71c3442c343929cdf72d5a3a2ebb01fb80909447d26d8687410b8"
+    },
+    {
+      "file": "0003_gm_reasoner_v1.sql",
+      "sha256": "9c6c1507ec3e44cdebcd4f8c20dc928eb0657794327f5601256bc586c2a513b1"
+    },
+    {
+      "file": "0004_game_systems_v2.sql",
+      "sha256": "08ac4453a022c0024cb31cf58f29e6e5fe7c46b211ef37020f46c654b1a159f0"
+    },
+    {
+      "file": "0004_gm_reasoner_v1_hardening.sql",
+      "sha256": "96933f316c9f2d6c0cb6e2f195e84f3fc83c3c3a884d73671e3a32665c8de28b"
+    },
+    {
+      "file": "0005_game_systems_v2_hardening.sql",
+      "sha256": "b276270b7c4ee6b4e79c2577266936198479721d70344cb7d5749bf7fcd9402f"
+    },
+    {
+      "file": "0006_game_systems_v2_security_hardening.sql",
+      "sha256": "a0925adf57735d0f405ad8d39be09fa46745fb261048a86f62552e66f60d45b7"
+    },
+    {
+      "file": "0007_game_systems_v2_performance_hardening.sql",
+      "sha256": "964fe8cb6d43dd5cc67fd167c08a57ae99f348d960554f30ae46619ed74e4a10"
+    },
+    {
+      "file": "20260830094325_allow_campaign_owner_select.sql",
+      "sha256": "e455720ce3478a1269c6af3460ad6093c6127017622563f52afebf93f65e131a"
+    },
+    {
+      "file": "20260830094401_repair_campaign_bootstrap_v2.sql",
+      "sha256": "24d320c9f3cd5bfca10958bd664df6631c5e9ac8f71990dd606ceac8109b4100"
+    },
+    {
+      "file": "20260830143000_starter_worlds_and_conversion_events.sql",
+      "sha256": "c6cdf4347ecf70f3c5c1781bdc075231285ff4dd742a5b1eb17ba9ccf7a3638d"
+    },
+    {
+      "file": "20260830143600_product_events_campaign_index.sql",
+      "sha256": "4e9b1c3d1df062abd175ecc5ddf38326370d78c84129ec23695d2edd1519213d"
+    },
+    {
+      "file": "20260830150000_ecosystem_funnel_events.sql",
+      "sha256": "a9be013ee16eae73830b19f486df518ad2efbd3a4a53829cb9f6d11720ed2aab"
+    },
+    {
+      "file": "20260831003000_complete_starter_worlds.sql",
+      "sha256": "a7f979d8e3c40b923b35e93b6bec721fbfba440637d80c69e2f8674b2382b567"
+    },
+    {
+      "file": "20260831010000_living_characters.sql",
+      "sha256": "4a8069beb4569f43d667ac7fe0c9c294b10fbb94ce69511d83525ab0910216d2"
+    },
+    {
+      "file": "20260831013000_living_characters_runtime.sql",
+      "sha256": "4617ae9dc2445a3c3973726322f912ab075b4ec73bb0ae03a1ec61f4aa637862"
+    },
+    {
+      "file": "20260831055048_selective_cinematic_mode.sql",
+      "sha256": "0d3f959cbbc85e7afd1c8ccc1fb93e6906d02d251565b82b6c18e038dff72eab"
+    },
+    {
+      "file": "20260831090000_retry_failed_cinematics.sql",
+      "sha256": "6dc0822c6bac0dcde7d1bfb260e5478110cb70f5656edd9ae729d4899672c699"
+    },
+    {
+      "file": "20260831170000_competitive_ai_runtime.sql",
+      "sha256": "bb2241c849c06c665f297af70617c2e3e32d7db160988828d7d38174fb8ea0c3"
+    },
+    {
+      "file": "20260831171000_competitive_ai_runtime_hardening.sql",
+      "sha256": "524040ce5c76c32e6abcb249e555a082c8fa44b4d9368f02b533ead41b717f72"
+    },
+    {
+      "file": "20260831180000_strict_forward_turn_sequence.sql",
+      "sha256": "dab68a02c70824b43669bccc81260596571c1eeae5b395df44d57fde67572c7d"
+    },
+    {
+      "file": "20260831183000_character_attributes_and_kill_experience.sql",
+      "sha256": "130b7d53999136afde9b5fc9388701a3143ea724e87b6596a43f3cb50746eb56"
+    },
+    {
+      "file": "20260831184500_core_six_ability_scores.sql",
+      "sha256": "1192f9e2a7b9742eea923eb8ff6c0ad52c81753d9270458f88f132ff1676c9e4"
+    },
+    {
+      "file": "20260901010000_portfolio_event_outbox.sql",
+      "sha256": "6209cf5c6c56a119e3ddd132f31b4c57fc5de6acb48f79e5be99b67d86db7779"
+    },
+    {
+      "file": "20260901010100_portfolio_event_outbox_deny_policy.sql",
+      "sha256": "a67294ed4b323643e571812660a54d4a4093dee31f5689e3b3ebccf167faae28"
+    },
+    {
+      "file": "20260922090000_turn_integrity_hardening.sql",
+      "sha256": "2473779e2a689cac8ca6fc4925b175b6cc1846d0a8a561045a412f1439a076df"
+    },
+    {
+      "file": "20261019045443_game_turn_response_controls.sql",
+      "sha256": "db796fd9a4758ef451e2bd8ef144397860fc3305d7163c006083570c3f579b7f"
+    },
+    {
+      "file": "20261019051934_stable_turn_transcript_order.sql",
+      "sha256": "ecaeca4830c962bec555486c8c864878758cb0ee09b09a70f76d98d4634ba1e1"
+    },
+    {
+      "file": "20261021012412_restore_reproducible_game_schema.sql",
+      "sha256": "069f46d77a297d893c2a4b00baf593f82834fbab976a9094e2fcbd62d5829835"
+    }
+  ]
+}
