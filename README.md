@@ -23,8 +23,8 @@ A persistent AI-native role-playing universe where the world remembers what the 
 - Campaign memory: episodic, semantic, decisions, quests and quest graph.
 - Living entities: player-owned PCs, autonomous NPCs, factions and items.
 - Game Systems v2: multiplayer roles/invites, world clock, rulesets, inventory/equipment, health and deterministic combat.
-- Competitive AI runtime: deterministic FSM bots, immutable server-authored telemetry, shared Elo ratings, matchmaking, adaptive difficulty and asynchronous anomaly detection.
-- Hard AI boundary: Living Characters and the Game Master never execute inside the authoritative competitive hot path.
+- Competitive AI primitives: tested deterministic FSM, telemetry, Elo/ranking and risk libraries plus database contracts. Reachable match execution, matchmaking and asynchronous rating/risk workers are not yet demonstrated by this application.
+- Competitive integration contract: Living Characters and the Game Master must remain outside any future authoritative competitive hot path.
 - Stable Spine: Action Envelope -> classification -> policy -> execution -> verification -> audit.
 - Policy states: AUTO, BOUNDED_AUTO, GATED, PROHIBITED.
 - Consequential external actions remain gated.
@@ -48,3 +48,18 @@ The repository intentionally contains no service-role keys or private secrets.
 ## Status and evidence
 
 > Portfolio status: [STATUS.md](https://github.com/AndrewLamSingapore/orqevia/blob/main/STATUS.md) is the sole portfolio status reference. Each product owns its source, configuration, contracts and domain records. The [operational manifest](https://github.com/AndrewLamSingapore/orqevia/blob/main/governance/operational-manifest.json) provides dated ORQEVIA component and observation references; it does not establish deployment status.
+
+
+## Reproducible verification and remaining gates
+
+`npm ci && npm test` verifies the local candidate. `npm run test:schema-recovery`
+verifies real PostgreSQL/pgvector replay, isolation and dump/restore in a disposable
+offline container; see [DATABASE_RECOVERY.md](docs/DATABASE_RECOVERY.md) for the
+pinned image and historical migration collision. It does not deploy services or
+repair production migration history.
+
+The [21 October engineering audit](docs/SOVEREIGNTY_AUDIT_20261021.md) classifies
+this product as **PARTIALLY COMPLETE**. Candidate credential, schema recovery and
+optional-relay repairs passed local tests. Actual deployed guest gameplay,
+production recovery and the competitive integrations remain separate unpassed
+gates. The production health endpoint checks configuration only.

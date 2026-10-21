@@ -2,7 +2,12 @@
 
 # Competitive AI architecture
 
-The competitive runtime and narrative AI are separate trust and latency domains.
+The competitive primitives and narrative AI are designed as separate trust and
+latency domains. Current owning source contains tested FSM/telemetry/rating/risk
+libraries and database contracts, but no application/API/Edge consumer of those
+libraries beyond tests was demonstrated in the 21 October 2026 audit. Match
+execution, matchmaking and asynchronous workers below are integration contracts,
+not a claim that a live competitive service has been implemented or deployed.
 
 ## Non-negotiable boundary
 
