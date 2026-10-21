@@ -20,10 +20,10 @@ test('browser receives provisional text before committed result and surfaces str
 });
 test('preview cannot default or explicitly point at the production backend',()=>{
  assert.equal(gameBackend({VERCEL_ENV:'preview'}),null);
- assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://vtrfgckzpjgtmqsnumur.supabase.co/',GAME_SUPABASE_PUBLISHABLE_KEY:'fixture'}),null);
- assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://VTRFGCKZPJGTMQSNUMUR.supabase.co:443',GAME_SUPABASE_PUBLISHABLE_KEY:'fixture'}),null);
+ assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://vtrfgckzpjgtmqsnumur.supabase.co/',GAME_SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture'}),null);
+ assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://VTRFGCKZPJGTMQSNUMUR.supabase.co:443',GAME_SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture'}),null);
  assert.ok(gameBackend({VERCEL_ENV:'production'}));
- assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://isolated.supabase.co',GAME_SUPABASE_PUBLISHABLE_KEY:'fixture'}).url,'https://isolated.supabase.co');
+ assert.equal(gameBackend({VERCEL_ENV:'preview',GAME_SUPABASE_URL:'https://isolated.supabase.co',GAME_SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture'}).url,'https://isolated.supabase.co');
 });
 function fakeRes(){return {headers:{},chunks:[],statusCode:200,setHeader(k,v){this.headers[k]=v;},status(s){this.statusCode=s;return this;},json(x){this.body=x;return this;},write(x){this.chunks.push(x);},end(){this.ended=true;},flushHeaders(){}};}
 test('narration quota denies before provider invocation and storage errors fail closed',async()=>{
