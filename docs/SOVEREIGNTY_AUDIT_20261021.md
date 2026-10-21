@@ -110,9 +110,10 @@ The source's competitive libraries (`src/competitive/*`) implement bounded FSM,
 telemetry, Elo/ranking and anomaly functions with unit tests. Search results show
 no application/API/Edge consumer of those modules beyond tests. Their tables and
 architecture document do not establish reachable competitive match execution,
-a matchmaking service, rating workers or a replay UI. README wording describes
-more operational integration than the owning executable paths demonstrate.
-Complete or explicitly scope those claims before selling that capability.
+a matchmaking service, rating workers or a replay UI. The baseline README described more operational integration than the owning
+executable paths demonstrate. Candidate README/architecture text now scopes these
+as tested primitives and integration contracts; the missing services remain a
+product gap before selling that capability.
 
 Historical `0004` version collisions remain intact. The verified local recovery
 runner handles ordering by full filename with an early compatibility prelude;
@@ -131,6 +132,7 @@ commercial adoption. No invented launch revenue, user count or SLA is claimed.
   `prime` source IDs and the parked product's enum value. These are versioned,
   hashed contract compatibility, not an active centralized runtime. Do not
   rewrite their bytes independently of the owning contract and consumers.
+- The outdated owner-rule pointer in `AGENTS.md` now names ORQEVIA.
 - `PRIME_*` environment names in the optional event client/health are legacy
   ORQEVIA integration compatibility. They are not core game dependencies.
   A reviewed ORQEVIA-named alias migration can retire them without destroying

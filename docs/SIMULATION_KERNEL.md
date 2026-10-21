@@ -2,7 +2,7 @@
 
 # Simulation Kernel boundary
 
-Game Platform's deterministic competitive systems form a reusable simulation primitive while the commercial RPG remains independent.
+Game Platform implements a bounded synthetic scenario simulator independently of the RPG. Its tested competitive FSM/Elo/risk libraries are separate primitives; this simulator does not execute a competitive match or invoke those libraries.
 
 A portfolio simulation request must be a bounded, non-authoritative scenario specification. Simulation never writes another product's production state. Results can be exported as `game.simulation.completed`, `game.strategy.tested`, or `game.anomaly.detected` Portfolio Events with assumptions, seed/ruleset, metrics and provenance.
 
