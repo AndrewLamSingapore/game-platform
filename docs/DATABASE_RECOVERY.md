@@ -107,3 +107,7 @@ drop schema objects as an emergency shortcut. A conditional legacy rename is a
 schema migration; restoring its pre-migration backup requires a separate
 approved data-recovery procedure. Verify actual cloud backup retention,
 restorability and recovery objectives before claiming operational readiness.
+
+## Fresh-install tooling update — 21 October 2026
+
+The historical diagnosis above is retained. A separate supported CLI commissioning path is now implemented in [FRESH_INSTALL.md](FRESH_INSTALL.md), with canonical Git-byte input hashes and an immutable staged baseline identity. It preserves the original colliding files and existing deployed history. Local actual CLI install, no-op replay and complete synthetic restore are tested independently; managed Auth, PostgREST, Edge and cloud recovery remain separate gates. Existing production is unchanged by this tooling update.

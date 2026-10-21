@@ -63,3 +63,5 @@ this product as **PARTIALLY COMPLETE**. Candidate credential, schema recovery an
 optional-relay repairs passed local tests. Actual deployed guest gameplay,
 production recovery and the competitive integrations remain separate unpassed
 gates. The production health endpoint checks configuration only.
+
+Independent empty database commissioning uses the deterministic staged CLI path in [FRESH_INSTALL.md](docs/FRESH_INSTALL.md). Existing installations retain their original ledger; no production reset or history rewrite is required.
