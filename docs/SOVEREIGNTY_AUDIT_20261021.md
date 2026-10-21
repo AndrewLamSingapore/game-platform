@@ -100,8 +100,11 @@ No core source imports a sibling repository. Required runtime dependencies are
 this product's Vercel deployment, its own Supabase services, and its browser
 module source. Model service failure has an existing deterministic narrative
 fallback. Authority Engine evidence is a bounded optional read-only adapter
-with an explicit unavailable response. Portfolio relay delivery is optional by
-design, but the simulation error described above still needs isolation.
+with an explicit unavailable response. Portfolio relay delivery is now isolated
+behind one shared two-second deadline; the simulation returns its identical local
+result when optional delivery fails, with explicit queue/delivery status and no
+claim of durability without an acknowledgement. Invalid scenarios and failed
+authorization still fail. See `tests/simulation-sovereignty.test.mjs`.
 
 The source's competitive libraries (`src/competitive/*`) implement bounded FSM,
 telemetry, Elo/ranking and anomaly functions with unit tests. Search results show
@@ -147,8 +150,8 @@ repository or original working tree was modified. `npm test` passing does not
 establish live readiness. The new database CI job is source configuration only
 until an actual remote run is recorded.
 
-Close the optional relay bug, review/merge through existing gates, then obtain
-authorized isolated Supabase/Vercel commissioning and a full guest creation ->
+Review/merge the local credential, recovery and optional-relay repairs through
+existing gates, then obtain authorized isolated Supabase/Vercel commissioning and a full guest creation ->
 decision -> reload -> membership/failure -> recovery acceptance run. Compare
 schema/history and advisors before a production migration, retain rollback
 artifacts, and record the target revision. Competitive scope and commercial
