@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { stageFreshDatabase } from './stage-fresh-database.mjs';
@@ -30,12 +30,27 @@ const campaign = '20000000-0000-0000-0000-000000000002';
 const checks = [];
 let created = false;
 const docker = (args, input) => execFileSync('docker', args, { input, encoding: 'utf8', timeout: 45000, maxBuffer: 32 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, POSTGRES_PASSWORD: password } });
+function runSupabase(args, options) {
+  try {
+    return execFileSync(cli, args, options);
+  } catch (error) {
+    // npm installs Supabase as a .cmd shim on Windows. Node cannot spawn that
+    // shim without a shell, so invoke the same JavaScript entry directly.
+    const npmScript = process.env.APPDATA
+      ? path.join(process.env.APPDATA, 'npm', 'node_modules', 'supabase', 'dist', 'supabase.js')
+      : '';
+    if (process.platform !== 'win32' || process.env.GAME_SUPABASE_CLI || error.code !== 'ENOENT' || !existsSync(npmScript)) {
+      throw error;
+    }
+    return execFileSync(process.execPath, [npmScript, ...args], options);
+  }
+}
 function cliUp(database, workdir) {
   try {
-    return execFileSync(cli, ['migration', 'up', '--db-url', `postgresql://postgres:${password}@127.0.0.1:${port}/${database}?sslmode=disable`, '--workdir', workdir, '--yes'], { encoding: 'utf8', timeout: 90000, maxBuffer: 32 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, SUPABASE_ACCESS_TOKEN: '', SUPABASE_DB_PASSWORD: '', NO_COLOR: '1' } });
+    return runSupabase(['migration', 'up', '--db-url', `postgresql://postgres:${password}@127.0.0.1:${port}/${database}?sslmode=disable`, '--workdir', workdir, '--yes'], { encoding: 'utf8', timeout: 90000, maxBuffer: 32 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, SUPABASE_ACCESS_TOKEN: '', SUPABASE_DB_PASSWORD: '', NO_COLOR: '1' } });
   } catch (error) {
     // Never serialize child command arguments or inherited credentials.
-    throw new Error([error.stderr, error.stdout].filter(Boolean).join('\n').replaceAll(password, '[redacted]').replace(/postgres(?:ql)?:\/\/[^\s]+/g, '[database-url-redacted]'));
+    throw new Error([error.message, error.stderr, error.stdout].filter(Boolean).join('\n').replaceAll(password, '[redacted]').replace(/postgres(?:ql)?:\/\/[^\s]+/g, '[database-url-redacted]'));
   }
 }
 function fullFingerprint(database) {
@@ -90,7 +105,15 @@ try {
   created = true;
   let ready = false;
   for (let attempt = 0; attempt < 50; attempt += 1) {
-    try { docker(['exec', container, 'pg_isready', '-U', 'postgres']); ready = true; break; }
+    try {
+      const logs = docker(['logs', container]);
+      if (!logs.includes('PostgreSQL init process complete; ready for start up.')) {
+        throw new Error('PostgreSQL initialization is not complete');
+      }
+      docker(['exec', container, 'psql', '-X', '-q', '-A', '-t', '-U', 'postgres', '-d', 'postgres', '-c', 'select 1;']);
+      ready = true;
+      break;
+    }
     catch { await new Promise(resolve => setTimeout(resolve, 200)); }
   }
   assert.ok(ready, 'disposable PostgreSQL must start');
