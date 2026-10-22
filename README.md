@@ -65,3 +65,10 @@ production recovery and the competitive integrations remain separate unpassed
 gates. The production health endpoint checks configuration only.
 
 Independent empty database commissioning uses the deterministic staged CLI path in [FRESH_INSTALL.md](docs/FRESH_INSTALL.md). Existing installations retain their original ledger; no production reset or history rewrite is required.
+
+## Campaign visual
+
+Repository advertising creative, generated through the bounded Higgsfield
+campaign (batch 2026-10-22, zero retries, under the US$0.03 cap):
+
+![Game Platform campaign visual](docs/ads/ad-1600x900.png)
