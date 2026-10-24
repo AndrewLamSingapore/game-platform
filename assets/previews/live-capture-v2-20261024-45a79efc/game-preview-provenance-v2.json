@@ -1,0 +1,73 @@
+{
+  "schema": "product-preview-provenance.v2",
+  "product": "game",
+  "created_at": "2026-10-24T04:39:49.691165+00:00",
+  "recorded_owning_source_revision": "3a9a5cf45be2781ba5dd99f7bac5f72c80017d34",
+  "source_product_url": "https://game-platform-wine-nine.vercel.app",
+  "asset_classification": "EDITED_GENUINE_PRODUCT_VIDEO_NO_NEW_GENERATED_CINEMATIC_FOOTAGE",
+  "new_paid_provider_calls": 0,
+  "source_recording_sha256": "1524682fac5fc4fb753bf3148aa7b7946e2b983af28493724f1e284db429da81",
+  "source_capture_evidence_sha256": "f12b58e41f4183e3f3846955d65090503c0b30e110703958df47ad12da750c34",
+  "recorded_feature_boundary": "Guest access, actual campaign, server-resolved combat and reload persistence only. No AI narration/world-behavior qualification.",
+  "domain_references": [],
+  "audio": "Original numerical ambient composition and owner-requested installed offline Windows speech. No stock recording.",
+  "files": [
+    {
+      "path": "game-trailer-60s-v2.mp4",
+      "bytes": 4902672,
+      "sha256": "4f888c65a21224593fdfd5543de3ed85c93243f642287b339b2ca24b024490c0"
+    },
+    {
+      "path": "game-trailer-60s-v2.vtt",
+      "bytes": 932,
+      "sha256": "ea6154e1264faa6ad1134e75cdfdf49a31d3c30214fe4858f5f49e282977efe7"
+    },
+    {
+      "path": "game-trailer-60s-v2.transcript.md",
+      "bytes": 1364,
+      "sha256": "2d50f7a5700cc8c814a0c0c59478c7e2ed2ce38a9ac5e413501cb4d037974489"
+    },
+    {
+      "path": "game-technical-demo-30s-v2.mp4",
+      "bytes": 2536772,
+      "sha256": "38f9dbad1f746f6b4741bcc1aeb25022a1d66cbb85aecff1ad57f40ff36a61e1"
+    },
+    {
+      "path": "game-technical-demo-30s-v2.vtt",
+      "bytes": 860,
+      "sha256": "359de014ca2fddd2ad90bd1e41c2985e05a3a787d8192de87a434e1bdd1bfe61"
+    },
+    {
+      "path": "game-technical-demo-30s-v2.transcript.md",
+      "bytes": 1281,
+      "sha256": "85b5d66c48a8a64d2a984978f0b6d91659ce8abe0f9ef7cc20c8a24e706579a6"
+    },
+    {
+      "path": "game-teaser-15s-v2.mp4",
+      "bytes": 1273827,
+      "sha256": "cae15ae6ce9b0bc425567c6b860bb0d5bf9773124fb8b741dca1b10d24177c64"
+    },
+    {
+      "path": "game-teaser-15s-v2.vtt",
+      "bytes": 514,
+      "sha256": "b924ef35ba073bb0bcc6cdf6d1ee825ec4d32b5b4daf02b30612a1a6dda16d9a"
+    },
+    {
+      "path": "game-teaser-15s-v2.transcript.md",
+      "bytes": 1019,
+      "sha256": "0e6d265c695fc45b1c4fe30f6299f73c43b32a9eafcc73b354fd01a86596317a"
+    },
+    {
+      "path": "game-poster.png",
+      "bytes": 194959,
+      "sha256": "e1667b9a0bfaa9902c514b31680033a7a708c8be1f97934eee71df347d2ae5e1"
+    },
+    {
+      "path": "game-thumbnail.png",
+      "bytes": 561040,
+      "sha256": "f29b819ebbf479ecdeeb585a4c7fb2c8f5fc7070ad7e4583bacdc6e8df2393f0"
+    }
+  ],
+  "physical_mobile_device_tested": false,
+  "human_spot_check_claimed": false
+}
