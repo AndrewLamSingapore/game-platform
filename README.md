@@ -1,4 +1,6 @@
-# Game Platform
+[![LIVING WORLDS — A world that remembers your choices.](docs/repository-banner.svg)](https://game-platform-wine-nine.vercel.app/)
+
+# Living Worlds · Game Platform
 
 [**Open Living Worlds ↗**](https://game-platform-wine-nine.vercel.app/) · [**Discuss this project**](https://authority-engine-app.vercel.app/contact?source=game-platform) · [**Meet Andrew Lam**](https://authority-engine-app.vercel.app/about)
 
@@ -6,9 +8,19 @@ An independent working prototype of an AI-assisted persistent role-playing platf
 
 This product implements Shared Design Language v1 concepts independently. It owns its runtime, database, secrets and deployment. Optional portfolio event exchange and public navigation connect it to the wider work without transferring game authority.
 
+## Start here
+
+| You want to… | Go to |
+| --- | --- |
+| Explore the prototype | [Living Worlds](https://game-platform-wine-nine.vercel.app/) and [guest-preview limits](#current-release) |
+| Run or inspect the source | [Architecture](#architecture), [verification](#reproducible-verification-and-remaining-gates) and [fresh installation](docs/FRESH_INSTALL.md) |
+| Discuss or report a problem | [Issues](https://github.com/AndrewLamSingapore/game-platform/issues) and [Discussions](https://github.com/AndrewLamSingapore/game-platform/discussions); include reproduction steps without credentials or private campaign data |
+
+[Browse all six projects and their source](https://github.com/AndrewLamSingapore/AndrewLamSingapore#selected-work) · [About Andrew](https://authority-engine-app.vercel.app/about)
+
 ## Connected work
 
-[**Explore ORQEVIA**](https://authority-engine-app.vercel.app/jarvis) · [**Meet Andrew**](https://authority-engine-app.vercel.app/about) · [**Start a conversation**](https://authority-engine-app.vercel.app/contact?source=game-platform&intent=collaboration)
+[**Explore ORQEVIA**](https://authority-engine-app.vercel.app/orqevia) · [**Meet Andrew**](https://authority-engine-app.vercel.app/about) · [**Start a conversation**](https://authority-engine-app.vercel.app/contact?source=game-platform&intent=collaboration)
 
 ORQEVIA’s public walkthrough connects this project to Andrew’s wider work. Public navigation and enquiries do not merge accounts, data or runtime authority. Current operational evidence comes from the canonical portfolio record; this README describes source capabilities.
 

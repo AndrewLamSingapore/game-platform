@@ -2,7 +2,7 @@
 
 For ORQEVIA and portfolio work, review current status claims in
 [STATUS.md](https://github.com/AndrewLamSingapore/orqevia/blob/main/STATUS.md) in the
-private ORQEVIA repository. It is a portfolio status record, not a source for
+public ORQEVIA repository. It is a portfolio status record, not a source for
 product code, configuration, contracts, or domain data. Each product owns those
 records in its own repository.
 Only Lam may move an item into its "Verified" sections.
