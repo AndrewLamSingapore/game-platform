@@ -14,7 +14,7 @@ This product implements Shared Design Language v1 concepts independently. It own
 | --- | --- |
 | Explore the prototype | [Living Worlds](https://game-platform-wine-nine.vercel.app/) and [guest-preview limits](#current-release) |
 | Run or inspect the source | [Architecture](#architecture), [verification](#reproducible-verification-and-remaining-gates) and [fresh installation](docs/FRESH_INSTALL.md) |
-| Discuss or report a problem | [Issues](https://github.com/AndrewLamSingapore/game-platform/issues) and [Discussions](https://github.com/AndrewLamSingapore/game-platform/discussions); include reproduction steps without credentials or private campaign data |
+| Discuss or report a problem | [Issues](https://github.com/AndrewLamSingapore/game-platform/issues) and [Discussions](https://github.com/AndrewLamSingapore/game-platform/discussions) · [Wiki](https://github.com/AndrewLamSingapore/game-platform/wiki); include reproduction steps without credentials or private campaign data |
 
 [Browse all six projects and their source](https://github.com/AndrewLamSingapore/AndrewLamSingapore#selected-work) · [About Andrew](https://authority-engine-app.vercel.app/about)
 
