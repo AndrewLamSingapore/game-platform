@@ -4,7 +4,7 @@ const finePointer=matchMedia('(hover: hover) and (pointer: fine)').matches;
 const worlds={
   'ashen-gate':{
     name:'The Ashen Gate',
-    genre:'Dark fantasy · 6–10 hours',
+    genre:'Dark fantasy',
     art:'/assets/worlds/ashen-gate-cast.webp',
     accent:'#ff9b61',
     premise:'The final gate is closing. Someone outside knows your name—and carries proof that the city was built on a lie.',
@@ -19,7 +19,7 @@ const worlds={
   },
   'neon-midnight':{
     name:'Neon After Midnight',
-    genre:'Noir science-fiction · 6–10 hours',
+    genre:'Noir science-fiction',
     art:'/assets/worlds/neon-midnight-cast.webp',
     accent:'#5ff4ff',
     premise:'A train arrives seven years late. Every passenger remembers a future that has not happened—including yours.',
@@ -33,7 +33,7 @@ const worlds={
   },
   'last-expedition':{
     name:'The Last Expedition',
-    genre:'Lost-world exploration · 6–10 hours',
+    genre:'Lost-world exploration',
     art:'/assets/worlds/last-expedition-cast.webp',
     accent:'#63e2c6',
     premise:'Your missing expedition broadcasts one final message from beneath an ocean that should not exist.',
