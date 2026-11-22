@@ -1,6 +1,6 @@
 [![LIVING WORLDS — A world that remembers your choices.](docs/repository-banner.svg)](https://game-platform-wine-nine.vercel.app/)
 
-# Living Worlds · Game Platform
+# Living Worlds
 
 [**Open Living Worlds ↗**](https://game-platform-wine-nine.vercel.app/) · [**Discuss this project**](https://authority-engine-app.vercel.app/contact?source=game-platform) · [**Meet Andrew Lam**](https://authority-engine-app.vercel.app/about)
 

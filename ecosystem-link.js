@@ -1,7 +1,7 @@
 const ECOSYSTEM_APPS={
   portal:'https://the-portal-ten.vercel.app/',
   authorityEngine:'https://authority-engine-app.vercel.app/',
-  jarvis:'https://authority-engine-app.vercel.app/jarvis',
+  jarvis:'https://authority-engine-app.vercel.app/orqevia',
   gamePlatform:'https://game-platform-wine-nine.vercel.app/',
   velyqua:'https://velyqua.vercel.app/',
   skyTablet:'https://sky-tablet.vercel.app/',
@@ -36,7 +36,7 @@ function link(destination,label,placement){
 }
 const nav=document.createElement('nav');nav.className='ecosystem-nav';nav.setAttribute('aria-label','Lam ecosystem');
 nav.append(link('portal','The Portal','top_nav'),link('authorityEngine','Authority Engine','top_nav'),link('jarvis','ORQEVIA · 奥启维亚','top_nav'),link('gamePlatform','Living Worlds','top_nav'),link('velyqua','VELYQUA','top_nav'),link('skyTablet','Sky Tablet','top_nav'),link('github','GitHub','top_nav'));
-document.querySelector('header')?.after(nav);
+const related=document.createElement('details');related.className='public-related';const relatedTitle=document.createElement('summary');relatedTitle.textContent='More projects by Andrew Lam';related.append(relatedTitle,nav);document.querySelector('main')?.after(related);
 if(current==='portal'){
   const cta=link('gamePlatform','PLAY LIVING WORLDS →','portal_hero');cta.className='primary ecosystem-cta-primary';document.querySelector('.hero-actions')?.append(cta);
 }
@@ -57,9 +57,4 @@ const talk = document.createElement('a'); talk.href = contactUrl; talk.textConte
 const linkedIn = document.createElement('a'); linkedIn.href = 'https://www.linkedin.com/in/lam-teck-sing-andrew-79886719'; linkedIn.textContent = 'Connect on LinkedIn';
 actions.append(talk,linkedIn,link('jarvis','Explore ORQEVIA · 奥启维亚 ↗','creator_bridge')); bridge.append(intro,actions);
 (document.querySelector('main') || document.querySelector('footer'))?.after(bridge);
-// A short creator invitation is visible before the deep experience, not only in the footer.
-const creator = document.createElement('aside');creator.className='creator-invitation';creator.setAttribute('aria-label','Meet the creator');
-const creatorText=document.createElement('p');creatorText.textContent=current==='portal'?'An exploration by Andrew Lam. Follow an idea. Find a connection. Bring your perspective.':'An interactive world by Andrew Lam. Play a scene, then imagine what we could create together.';
-const creatorLink=document.createElement('a');creatorLink.href=contactUrl;creatorLink.textContent='Talk with Andrew ↗';creator.append(creatorText,creatorLink);
-const entry=current==='portal'?document.querySelector('.hero'):document.querySelector('.dashboard-hero');entry?.append(creator);
 captureIncomingReferral();

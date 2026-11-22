@@ -1,0 +1,25 @@
+/* Living Worlds: keep the story and world selection in the foreground. */
+body { font-size: 16px; line-height: 1.6; background-color: #090b13; }
+body > header { padding: 18px max(24px, calc((100vw - 1240px) / 2)); background: #090b13ed; }
+body > header .tag { font-size: 1rem; letter-spacing: .045em; }
+body > header #who { display: block; margin-top: 5px; font-size: .875rem; font-weight: 500; color: #b8bdce; }
+main { max-width: 1280px; padding-inline: 24px; }
+.dashboard-hero { max-width: 920px; padding-block: 56px 36px; }
+.dashboard-hero h1, .opening h1 { max-width: 17ch; font-size: clamp(3.1rem, 6.8vw, 5.7rem); line-height: 1.02; letter-spacing: -.045em; }
+.dashboard-hero .lead, .opening .lead { font-size: 1.2rem; line-height: 1.65; max-width: 56ch; }
+.trust-row span { border-radius: 6px; background: transparent; font-size: .875rem; }
+.world-grid { gap: 22px; }
+.world-card { min-height: 450px; border-radius: 18px; padding: 28px; border-color: #b5a3e044; box-shadow: 0 24px 65px #0004; }
+.world-card h2 { font-size: 2rem; line-height: 1.12; }
+.world-card p { font-size: 1rem; line-height: 1.6; }
+.world-card:focus-visible { outline: 3px solid #d3c2ff; outline-offset: 5px; }
+.world-meta span { font-size: .875rem; }
+.create-grid { margin-top: 40px; gap: 24px; }
+.panel { box-shadow: none; border-radius: 16px; padding: 24px; }
+.public-related { max-width: 1232px; margin: 28px auto; border-top: 1px solid #ffffff25; padding: 16px 24px; }
+.public-related summary { min-height: 44px; cursor: pointer; color: #bbb8ce; }
+.public-related .ecosystem-nav { position: static; border: 0; padding: 18px 0; background: none; }
+.relationship-bridge { margin-block: 30px; }
+@media(max-width:850px) { .world-grid { grid-template-columns: 1fr; } .world-card { min-height: 340px; } }
+@media(max-width:600px) { body > header { padding: 16px; } main { padding-inline: 16px; } .dashboard-hero { padding-top: 32px; } .dashboard-hero h1, .opening h1 { font-size: clamp(2.7rem, 11vw, 3.8rem); } .world-card { padding: 24px; } }
+@media(prefers-reduced-motion:reduce) { .world-card { transition: none; } }
