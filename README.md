@@ -16,13 +16,13 @@ This product implements Shared Design Language v1 concepts independently. It own
 | Run or inspect the source | [Architecture](#architecture), [verification](#reproducible-verification-and-remaining-gates) and [fresh installation](docs/FRESH_INSTALL.md) |
 | Discuss or report a problem | [Issues](https://github.com/AndrewLamSingapore/game-platform/issues) and [Discussions](https://github.com/AndrewLamSingapore/game-platform/discussions) · [Wiki](https://github.com/AndrewLamSingapore/game-platform/wiki); include reproduction steps without credentials or private campaign data |
 
-[Browse all six projects and their source](https://github.com/AndrewLamSingapore/AndrewLamSingapore#selected-work) · [About Andrew](https://authority-engine-app.vercel.app/about)
+[Browse the project and source directory](https://github.com/AndrewLamSingapore/AndrewLamSingapore#selected-work) · [About Andrew](https://authority-engine-app.vercel.app/about)
 
 ## Connected work
 
 [**Explore ORQEVIA**](https://authority-engine-app.vercel.app/orqevia) · [**Meet Andrew**](https://authority-engine-app.vercel.app/about) · [**Start a conversation**](https://authority-engine-app.vercel.app/contact?source=game-platform&intent=collaboration)
 
-ORQEVIA’s public walkthrough connects this project to Andrew’s wider work. Public navigation and enquiries do not merge accounts, data or runtime authority. Current operational evidence comes from the canonical portfolio record; this README describes source capabilities.
+ORQEVIA’s public walkthrough connects this project to Andrew’s wider work. Public navigation and enquiries do not merge accounts, data or runtime authority. Each product owns its source and domain records. Current operation requires its own deployment and runtime evidence; this README describes source capabilities.
 
 ## Product thesis
 
@@ -59,7 +59,7 @@ The repository intentionally contains no service-role keys or private secrets.
 
 ## Status and evidence
 
-> Portfolio status: [STATUS.md](https://github.com/AndrewLamSingapore/orqevia/blob/main/STATUS.md) is the sole portfolio status reference. Each product owns its source, configuration, contracts and domain records. The [operational manifest](https://github.com/AndrewLamSingapore/orqevia/blob/main/governance/operational-manifest.json) provides dated ORQEVIA component and observation references; it does not establish deployment status.
+> Current ORQEVIA source: [ORQEVIA-CURRENT-STATE.md](https://github.com/AndrewLamSingapore/orqevia/blob/main/ORQEVIA-CURRENT-STATE.md), reached through the portfolio pointer [STATUS.md](https://github.com/AndrewLamSingapore/orqevia/blob/main/STATUS.md). Each product owns its source, configuration, contracts and domain records. The [operational manifest](https://github.com/AndrewLamSingapore/orqevia/blob/main/governance/operational-manifest.json) is a dated historical reference. Source, CI, deployment and runtime acceptance are separate evidence.
 
 
 ## Reproducible verification and remaining gates
