@@ -12,7 +12,7 @@
     "test:fresh-install": "node scripts/schema-recovery.mjs --commissioning"
   },
   "engines": {
-    "node": ">=22"
+    "node": "24.x"
   },
   "deployment_baseline": {
     "date": "2026-09-02",
